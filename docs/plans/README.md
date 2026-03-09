@@ -25,6 +25,8 @@ related_docs:
 
 Plans track execution order, dependencies, milestones, blockers, and mutable implementation work. Use plans for what is happening next and what is blocked by what.
 
+Testing and validation work belongs in plans when it changes sequencing, deliverables, or milestone exit criteria. Durable testing policy belongs in [ADRs](../adr/README.md) and [Specs](../specs/README.md).
+
 ## Reading Rules
 
 - Start with [Initial Implementation Plan](initial-implementation-plan.md) for the roadmap and milestone graph.

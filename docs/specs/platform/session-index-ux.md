@@ -17,8 +17,10 @@ tags:
 source_of_truth: "implementation-requirements"
 related_docs:
   - "docs/specs/platform/tech-spec.md"
+  - "docs/specs/platform/testing-strategy.md"
   - "docs/specs/platform/session-index-api.md"
   - "docs/adr/0006-session-index-stack-and-api-boundary.md"
+  - "docs/adr/0007-testing-strategy-and-inner-feedback-loops.md"
   - "docs/plans/05-session-index-and-operator-ux.md"
 ---
 
@@ -28,11 +30,15 @@ related_docs:
 
 Define the operator experience for the session index without expanding it into a second session client.
 
+This document is also the source of truth for behavior-oriented UI tests.
+
 ## Related Documents
 
 - [Open Platform Technical Specification](tech-spec.md)
+- [Testing Strategy](testing-strategy.md)
 - [Session Index API](session-index-api.md)
 - [ADR-0006: Session Index Stack and API Boundary](../../adr/0006-session-index-stack-and-api-boundary.md)
+- [ADR-0007: Testing Strategy and Inner Feedback Loops](../../adr/0007-testing-strategy-and-inner-feedback-loops.md)
 - [Session Index and Operator UX Plan](../../plans/05-session-index-and-operator-ux.md)
 
 ## Product Role
@@ -60,6 +66,8 @@ It is not responsible for:
 - inspect a failed or degraded session
 - restart a session
 - delete a session safely
+
+These are behavior scenarios that tests should cover at the smallest useful layer.
 
 ## Information Architecture
 
@@ -90,6 +98,8 @@ The UI should support at least these states:
 
 Per-session states should match the status model defined in [Session Index API](session-index-api.md).
 
+Tests should assert operator-visible behavior for each state rather than implementation details of how that state is rendered internally.
+
 ## Error and Recovery UX
 
 For common failures, the UI should present:
@@ -100,6 +110,15 @@ For common failures, the UI should present:
 - escalation path if the simple action fails
 
 The index page should be the first recovery surface. `K9s` and deeper cluster inspection are escalation tools.
+
+Tests should verify that common failures produce operator-meaningful guidance and a clear next action.
+
+## Async And Refresh Behavior
+
+- the UI should tolerate eventual consistency between requested actions and platform state
+- in-progress actions should have visible pending states
+- stale data should converge toward the documented state model rather than requiring manual page reloads for the happy path
+- tests should assert stable operator-visible outcomes rather than exact timing or polling cadence
 
 ## Authentication and Open-Session UX
 
@@ -118,9 +137,26 @@ Requirements:
 - uses touch-friendly action targets
 - keeps session status and next action readable at reduced width
 
+## Behavior Test Scenarios
+
+Canonical behavior scenarios include:
+
+- empty session list
+- loading session list
+- successful session creation
+- validation failure during session creation
+- ready session open flow
+- degraded or failed session with recovery guidance
+- auth failure distinguished from session failure
+- restart flow with visible in-progress and completion states
+- delete flow with confirmation and consequence messaging
+- stale or eventually consistent state converging to the correct operator-visible outcome
+- mobile or narrow-width usability
+
 ## Maintainability Guardrails
 
 - keep orchestration logic on the backend
 - keep frontend state shallow and typed
 - do not duplicate `opencode web` features
 - prefer simplicity and operator clarity over feature richness in v1
+- avoid tests that couple to private component state, incidental DOM structure, or backend implementation artifacts
