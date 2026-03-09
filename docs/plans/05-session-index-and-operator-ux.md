@@ -23,7 +23,9 @@ blocks:
   - "docs/plans/06-observability-and-hardening.md"
 related_docs:
   - "docs/adr/0006-session-index-stack-and-api-boundary.md"
+  - "docs/adr/0007-testing-strategy-and-inner-feedback-loops.md"
   - "docs/specs/platform/session-index-api.md"
+  - "docs/specs/platform/testing-strategy.md"
   - "docs/specs/platform/session-index-ux.md"
   - "docs/specs/platform/tech-spec.md"
 ---
@@ -71,24 +73,35 @@ Provide the single-user operator with the supported UX for normal platform use.
 - keep orchestration logic on the backend
 - keep the frontend thin and typed
 - allow static frontend assets in v1 if they preserve the thin operator-console model
+- verify this boundary through contract and behavior tests rather than implementation-coupled tests
 
 ### API Contract
 
 - finalize session resource shape
 - finalize create/list/open/restart/delete contract
 - ensure the UI consumes typed backend data rather than backend implementation details
+- define canonical contract scenarios alongside the API spec
+
+### Behavior-First TDD Workflow
+
+- write failing behavior-oriented tests before implementation at the smallest useful layer
+- prefer contract and component tests before reaching for full end-to-end coverage
+- keep tests focused on operator-visible behavior and stable contracts
+- require contract tests for API behavior changes and component or interaction tests for operator-visible UI behavior changes
 
 ### State, Error, and Loading UX
 
 - define session state model
 - define loading, empty, and error states
 - define operator-facing failure and retry behavior
+- require behavior coverage for visible state transitions and recovery affordances
 
 ### Responsive and Mobile Behavior
 
 - make the index usable on narrow viewports
 - avoid hover-only interaction
 - keep the operator mental model simple
+- cover responsive behavior with focused UI behavior tests rather than broad snapshots
 
 ### Auth and Open-Session UX
 
@@ -102,6 +115,7 @@ Provide the single-user operator with the supported UX for normal platform use.
 - make scripts internal, not public entrypoints
 - implement `cluster:doctor`, `cluster:reset`, and session log retrieval
 - document the supported recovery path
+- Tilt may optionally accelerate slow integration loops, but does not replace the supported `mise` operator path
 
 ## Validation
 
@@ -110,12 +124,15 @@ Provide the single-user operator with the supported UX for normal platform use.
 - the index page is enough for common workflows
 - the documented recovery path works
 - the index remains thin and does not duplicate `opencode web`
+- behavior-focused tests cover create, open, restart, delete, and recovery flows at appropriate layers
+- narrow-width and auth-failure behavior are covered at appropriate layers
 
 ## Exit Criteria
 
 - normal daily workflow is coherent and low-friction
 - operator can create, open, delete, and recover sessions with supported interfaces
 - the frontend/backend contract is stable enough to guide implementation
+- UI behavior coverage exists for operator-visible states and major flows
 
 ## Risks / Notes
 

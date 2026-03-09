@@ -24,6 +24,7 @@ blocks:
   - "docs/plans/05-session-index-and-operator-ux.md"
   - "docs/plans/06-observability-and-hardening.md"
 related_docs:
+  - "docs/specs/platform/testing-strategy.md"
   - "docs/specs/platform/tech-spec.md"
   - "docs/plans/03-cluster-network-and-kata.md"
   - "docs/plans/04-session-runtime.md"
@@ -81,6 +82,7 @@ Create the NixOS VM control plane and make it reproducible from repo configurati
 - ensure `git`, `kubectl`, `helm`, `k9s`, and `mise` are available
 - ensure the Go toolchain is available for backend builds
 - ensure the TypeScript build path is available where needed for frontend builds
+- Tilt may be installed later as optional contributor tooling, but it is not part of bootstrap success
 
 ### Secrets Access Path
 

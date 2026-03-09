@@ -18,6 +18,7 @@ related_docs:
   - "docs/specs/README.md"
   - "docs/adr/README.md"
   - "docs/plans/README.md"
+  - "docs/specs/platform/testing-strategy.md"
 ---
 
 # Platform Specs
@@ -29,14 +30,16 @@ This folder contains the active spec set for the platform. Read these after the 
 | Doc | Status | Focus |
 | --- | --- | --- |
 | [Open Platform Technical Specification](tech-spec.md) | draft | end-to-end platform design, requirements, and acceptance criteria |
+| [Testing Strategy](testing-strategy.md) | draft | behavior-focused TDD policy, layered test loops, and fixture strategy |
 | [Session Index API](session-index-api.md) | draft | typed frontend and backend API contract for the session index |
 | [Session Index UX](session-index-ux.md) | draft | operator-facing UX model, states, and responsive behavior |
 
 ## Reading Order
 
 1. [Open Platform Technical Specification](tech-spec.md)
-2. [Session Index API](session-index-api.md)
-3. [Session Index UX](session-index-ux.md)
+2. [Testing Strategy](testing-strategy.md)
+3. [Session Index API](session-index-api.md)
+4. [Session Index UX](session-index-ux.md)
 
 ## Related Docs
 

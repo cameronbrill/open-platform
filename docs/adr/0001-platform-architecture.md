@@ -18,7 +18,9 @@ tags:
 source_of_truth: "durable-decision"
 related_docs:
   - "docs/specs/platform/tech-spec.md"
+  - "docs/specs/platform/testing-strategy.md"
   - "docs/plans/initial-implementation-plan.md"
+  - "docs/adr/0007-testing-strategy-and-inner-feedback-loops.md"
 supersedes: []
 superseded_by: []
 ---
@@ -65,6 +67,8 @@ Adopt the following architecture:
 - `mise` for task and environment management.
 - `hk` for pre-commit hooks.
 - `fnox` for secret retrieval, backed by `1Password`.
+- behavior-focused TDD for repo-owned code and contracts.
+- `mise` as the public entrypoint for validation and testing workflows.
 
 The platform is explicitly single-user in v1. All browser-facing surfaces are localhost-only by default. Future remote access must be supported by adding a dedicated authenticated gateway layer without redesigning the internal session model.
 
@@ -76,6 +80,7 @@ The session index follows these additional v1 rules:
 - v1 avoids SSR
 - v1 avoids `React Router`
 - a thin frontend served as static assets is acceptable in v1
+- Tilt is optional and only used for slower integration and platform verification loops
 
 ## Rationale
 
@@ -264,6 +269,8 @@ The session index is the primary operator console for normal use, but it is inte
 - the frontend owns rendering, local interaction state, and typed API consumption
 - the index must not duplicate `opencode web` chat or terminal functionality
 - an explicit API contract must exist before the UI implementation couples to backend behavior
+- contract tests should protect the frontend/backend boundary
+- UI tests should verify operator-visible behavior rather than private implementation details
 
 ## Runtime Hardening Baseline
 
@@ -313,6 +320,7 @@ Scripts are implementation details and should not be the primary public interfac
 - lower observability maintenance than self-hosted alternatives
 - clear task and secret-management story
 - strong typing and explicit API boundaries for the operator UI
+- lower test brittleness when internals change but behavior stays the same
 
 ### Negative
 
@@ -321,6 +329,7 @@ Scripts are implementation details and should not be the primary public interfac
 - one endpoint per session creates more routing objects than a single central UI
 - `git clone per session` increases storage and startup cost
 - early API and state-model design introduces upfront work before UI implementation
+- behavior-focused TDD requires more up-front thinking about contracts, fixtures, and operator-visible states
 
 ### Neutral / Follow-Up
 
@@ -404,4 +413,7 @@ Recovery flows must be documented and must not require ad hoc manual debugging a
 - the platform documents a strict typing policy for Go and TypeScript code
 - secret values are not stored in `nix`, committed manifests, or repo-managed `.env` files
 - the formatting, linting, typechecking, build, and validation command surface is documented through `mise`
+- a documented layered testing strategy exists and treats contracts as first-class test artifacts
+- fast local behavior tests do not require full cluster bring-up
+- slower platform verification exists for localhost-only exposure, network policy, auth handling, and telemetry redaction
 - the architecture leaves room for a future authenticated remote-access layer without redesigning internal session routing

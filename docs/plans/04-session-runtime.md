@@ -25,6 +25,7 @@ blocks:
 related_docs:
   - "docs/adr/0003-runtime-secret-materialization.md"
   - "docs/adr/0005-session-exposure-and-routing.md"
+  - "docs/specs/platform/testing-strategy.md"
   - "docs/specs/platform/tech-spec.md"
   - "docs/plans/05-session-index-and-operator-ux.md"
 ---
@@ -96,6 +97,13 @@ Implement the first end-to-end session runtime.
 - ensure browser access remains localhost-only
 - ensure routing decisions remain compatible with the API contract
 
+### Runtime Behavior Tests
+
+- define behavior-focused checks for session creation, auth enforcement, readiness, restart, delete, and workspace isolation
+- separate fast runtime checks from slower integration and platform verification
+- Tilt may optionally help with slower runtime and routing integration loops, but remains secondary to `mise`
+- assert eventual operator-visible outcomes rather than exact timing or orchestration internals
+
 ## Validation
 
 - a manual session pod is reachable in browser
@@ -104,11 +112,13 @@ Implement the first end-to-end session runtime.
 - the session can be deleted and recreated cleanly
 - no unnecessary Kubernetes API credentials are present
 - auth exists and is enforced
+- runtime behavior checks assert operator-visible outcomes rather than incidental internal details
 
 ## Exit Criteria
 
 - one working OpenCode session exists end-to-end
 - routing, auth, and workspace behavior are stable enough for operator use
+- behavior-focused runtime checks exist at the appropriate layers
 
 ## Risks / Notes
 
