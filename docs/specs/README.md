@@ -35,4 +35,4 @@ Specs describe the current intended design and implementation requirements. Use 
 
 | Folder | Purpose |
 | --- | --- |
-| [Platform](platform/README.md) | platform architecture details, contracts, operator UX requirements, and testing strategy |
+| [Platform](platform/README.md) | platform architecture details, contracts, secret management, repository tooling, operator UX requirements, and testing strategy |
