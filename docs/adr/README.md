@@ -46,6 +46,7 @@ ADRs capture durable platform choices and rationale. Use them to answer why a de
 | [ADR-0008: Infisical Secret Management and CI Auth](0008-infisical-secret-management-and-ci-auth.md) | accepted | active secret manager, CI auth, and secret scanning direction |
 | [ADR-0009: Monorepo Toolchain with pnpm, Nx, and nx-go](0009-monorepo-toolchain-pnpm-nx-and-nx-go.md) | accepted | package management, orchestration, caching, and Go workspace model |
 | [ADR-0010: Repository Automation with Buildkite and RenovateBot](0010-repository-automation-buildkite-and-renovate.md) | accepted | CI system and dependency update automation |
+| [ADR-0011: Graphite Stacked Branch Workflow](0011-graphite-stacked-branch-workflow.md) | accepted | Graphite-first git operations, stacked review flow, and clean-`main` policy |
 
 ## Related Docs
 

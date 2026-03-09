@@ -90,8 +90,10 @@ The session index follows a strict v1 boundary:
 - provide declarative repo-managed local secret UX through `fnox`
 - standardize Node package management through `pnpm` and internal orchestration/caching through `Nx`
 - standardize local validation and guardrails with `hk`
+- keep `main` clean as the integration baseline
 - prefer strict typing everywhere practical
 - document the frontend/backend API contract before UI implementation
+- keep review units small and independently testable where practical
 - keep the operator UI responsive and mobile-tolerant even before remote access exists
 - use behavior-focused TDD for repo-owned code and contracts
 - maintain layered feedback loops so fast tests do not require the full platform stack
@@ -389,6 +391,16 @@ Requirements:
 - declare required secret names and local secret-aware execution behavior in repo-managed config
 - map local workflows to the active `Infisical` backend without storing secret values in the repo
 - integrate with `mise` rather than becoming a second public interface
+
+### `Graphite`
+
+`Graphite` is the required interface for all normal git operations.
+
+Requirements:
+
+- use `Graphite` for stacked branch creation, restacking, syncing, and submission
+- keep raw `git` for inspection and recovery only
+- shape work into small independently reviewable units
 
 ### `OpenCode`
 
@@ -966,9 +978,12 @@ Execution details live in:
 - `hk` hooks run locally
 - the public formatting, linting, typechecking, build, and validation surface is documented
 - the active repository tooling model is documented through [Repository Tooling](repository-tooling.md)
+- Graphite-based git workflow is documented through [Repository Tooling](repository-tooling.md)
 - pre-commit secret scanning is documented and part of the expected repo workflow
 - Buildkite CI and RenovateBot policy are documented as part of the repo tooling model
 - the repo-wide testing strategy is documented in [Testing Strategy](testing-strategy.md)
+- normal contribution flow does not require direct feature work on `main`
+- pragmatically small independently reviewable changes are the documented default
 - fast local behavior tests do not require full cluster bring-up whenever possible
 - slower platform verification exists separately for localhost-only exposure, network policy, auth handling, and telemetry redaction
 - Tilt, if present, remains optional and layered under `mise`

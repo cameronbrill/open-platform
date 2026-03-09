@@ -57,6 +57,7 @@ Open Platform treats repository docs as the primary source of truth for architec
 | [ADR-0008: Infisical Secret Management and CI Auth](adr/0008-infisical-secret-management-and-ci-auth.md) | accepted | active secret manager, CI auth, and secret scanning direction |
 | [ADR-0009: Monorepo Toolchain with pnpm, Nx, and nx-go](adr/0009-monorepo-toolchain-pnpm-nx-and-nx-go.md) | accepted | package management, task orchestration, caching, and Go workspace model |
 | [ADR-0010: Repository Automation with Buildkite and RenovateBot](adr/0010-repository-automation-buildkite-and-renovate.md) | accepted | CI system and dependency update automation |
+| [ADR-0011: Graphite Stacked Branch Workflow](adr/0011-graphite-stacked-branch-workflow.md) | accepted | Graphite-first git operations, stacked review flow, and clean-`main` policy |
 
 ## Specs
 
@@ -93,6 +94,7 @@ Open Platform treats repository docs as the primary source of truth for architec
 - `pnpm` is the Node package manager per [ADR-0009](adr/0009-monorepo-toolchain-pnpm-nx-and-nx-go.md).
 - `Nx` is the task orchestration and caching layer, with `@nx-go/nx-go` for Go integration.
 - `Buildkite` is CI and `RenovateBot` manages dependency updates per [ADR-0010](adr/0010-repository-automation-buildkite-and-renovate.md).
+- `Graphite` is used for all normal git operations per [ADR-0011](adr/0011-graphite-stacked-branch-workflow.md).
 - Backend code prefers `Go` and frontend code prefers `TypeScript` per [ADR-0006](adr/0006-session-index-stack-and-api-boundary.md).
 - v1 requires an explicit frontend and backend API contract before UI implementation.
 - v1 avoids SSR and avoids `React Router`.
@@ -100,6 +102,8 @@ Open Platform treats repository docs as the primary source of truth for architec
 - Behavior-focused TDD is the default engineering policy per [ADR-0007](adr/0007-testing-strategy-and-inner-feedback-loops.md).
 - `mise` is the public entrypoint for validation and testing workflows.
 - Tilt is optional and only used for slower integration and platform loops.
+- pull requests should stay pragmatically small and independently reviewable where practical.
+- `main` is kept clean as the integration baseline.
 
 ## QMD And Obsidian Notes
 

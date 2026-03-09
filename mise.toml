@@ -1,6 +1,7 @@
 [tools]
 node = "22"
 "npm:@tobilu/qmd" = "1.1.5"
+"npm:@withgraphite/graphite-cli" = "stable"
 watchexec = "2.5.0"
 
 [env]
