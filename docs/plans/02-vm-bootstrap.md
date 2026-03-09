@@ -1,15 +1,35 @@
-# VM Bootstrap
+---
+title: "VM Bootstrap"
+doc_id: "PLAN-002"
+doc_type: "plan"
+status: "draft"
+date: "2026-03-08"
+updated: "2026-03-09"
+summary: "Reproducible NixOS VM setup, operator access, and build-tool availability."
+aliases:
+  - "Plan 02"
+  - "VM Bootstrap Plan"
+tags:
+  - "plan"
+  - "vm"
+  - "nixos"
+  - "bootstrap"
+source_of_truth: "execution-plan"
+scope: "reproducible NixOS VM setup, operator access, and build-tool availability"
+depends_on:
+  - "docs/plans/01-repo-foundations.md"
+blocks:
+  - "docs/plans/03-cluster-network-and-kata.md"
+  - "docs/plans/04-session-runtime.md"
+  - "docs/plans/05-session-index-and-operator-ux.md"
+  - "docs/plans/06-observability-and-hardening.md"
+related_docs:
+  - "docs/specs/platform/tech-spec.md"
+  - "docs/plans/03-cluster-network-and-kata.md"
+  - "docs/plans/04-session-runtime.md"
+---
 
-- Status: Draft
-- Date: 2026-03-08
-- Scope: reproducible NixOS VM setup, operator access, and build-tool availability
-- Depends on:
-  - `docs/plans/01-repo-foundations.md`
-- Blocks:
-  - `docs/plans/03-cluster-network-and-kata.md`
-  - `docs/plans/04-session-runtime.md`
-  - `docs/plans/05-session-index-and-operator-ux.md`
-  - `docs/plans/06-observability-and-hardening.md`
+# VM Bootstrap
 
 ## Purpose
 

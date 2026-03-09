@@ -1,13 +1,35 @@
-# Session Runtime
+---
+title: "Session Runtime"
+doc_id: "PLAN-004"
+doc_type: "plan"
+status: "draft"
+date: "2026-03-08"
+updated: "2026-03-09"
+summary: "First end-to-end OpenCode session runtime with isolated workspaces, runtime secrets, auth, and local routing."
+aliases:
+  - "Plan 04"
+  - "Session Runtime Plan"
+tags:
+  - "plan"
+  - "session-runtime"
+  - "opencode"
+  - "auth"
+  - "routing"
+source_of_truth: "execution-plan"
+scope: "one OpenCode web session per pod with isolated workspace, runtime secrets, and local routing"
+depends_on:
+  - "docs/plans/03-cluster-network-and-kata.md"
+blocks:
+  - "docs/plans/05-session-index-and-operator-ux.md"
+  - "docs/plans/06-observability-and-hardening.md"
+related_docs:
+  - "docs/adr/0003-runtime-secret-materialization.md"
+  - "docs/adr/0005-session-exposure-and-routing.md"
+  - "docs/specs/platform/tech-spec.md"
+  - "docs/plans/05-session-index-and-operator-ux.md"
+---
 
-- Status: Draft
-- Date: 2026-03-08
-- Scope: one OpenCode web session per pod with isolated workspace, runtime secrets, and local routing
-- Depends on:
-  - `docs/plans/03-cluster-network-and-kata.md`
-- Blocks:
-  - `docs/plans/05-session-index-and-operator-ux.md`
-  - `docs/plans/06-observability-and-hardening.md`
+# Session Runtime
 
 ## Purpose
 

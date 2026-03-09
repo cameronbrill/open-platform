@@ -1,19 +1,40 @@
-# Initial Implementation Plan
+---
+title: "Initial Implementation Plan"
+doc_id: "PLAN-INIT-001"
+doc_type: "plan"
+status: "draft"
+date: "2026-03-08"
+updated: "2026-03-09"
+summary: "Roadmap, milestone boundaries, and dependency graph for the v1 platform implementation."
+aliases:
+  - "Implementation Plan"
+  - "Roadmap"
+tags:
+  - "plan"
+  - "roadmap"
+  - "milestones"
+  - "execution"
+source_of_truth: "execution-plan"
+scope: "roadmap for v1 single-user localhost-only platform bootstrap"
+depends_on:
+  - "docs/plans/00-operator-prerequisites.md"
+blocks: []
+source_docs:
+  - "docs/adr/0001-platform-architecture.md"
+  - "docs/specs/platform/tech-spec.md"
+related_docs:
+  - "docs/plans/README.md"
+  - "docs/adr/0001-platform-architecture.md"
+  - "docs/specs/platform/tech-spec.md"
+---
 
-- Status: Draft
-- Date: 2026-03-08
-- Scope: roadmap for v1 single-user localhost-only platform bootstrap
-- Depends on:
-  - `docs/plans/00-operator-prerequisites.md`
-- Source docs:
-  - `docs/adr/0001-platform-architecture.md`
-  - `docs/specs/platform/tech-spec.md`
+# Initial Implementation Plan
 
 ## Purpose
 
 Provide the high-level execution roadmap for implementing v1 of the platform.
 
-This file is intentionally roadmap-oriented. Detailed execution lives in the numbered plans in `docs/plans/`.
+This file is intentionally roadmap-oriented. Detailed execution lives in the numbered plans listed in the [Plans Index](README.md).
 
 ## In Scope
 
@@ -25,17 +46,17 @@ This file is intentionally roadmap-oriented. Detailed execution lives in the num
 
 - step-by-step implementation details that live in numbered plans
 - operator-only manual setup details
-- recording architecture decisions that belong in `docs/adr/`
+- recording architecture decisions that belong in [the ADR set](../adr/README.md)
 
 ## Plan Set
 
-- `docs/plans/00-operator-prerequisites.md`
-- `docs/plans/01-repo-foundations.md`
-- `docs/plans/02-vm-bootstrap.md`
-- `docs/plans/03-cluster-network-and-kata.md`
-- `docs/plans/04-session-runtime.md`
-- `docs/plans/05-session-index-and-operator-ux.md`
-- `docs/plans/06-observability-and-hardening.md`
+- [Operator Prerequisites](00-operator-prerequisites.md)
+- [Repo Foundations](01-repo-foundations.md)
+- [VM Bootstrap](02-vm-bootstrap.md)
+- [Cluster Network and Kata](03-cluster-network-and-kata.md)
+- [Session Runtime](04-session-runtime.md)
+- [Session Index and Operator UX](05-session-index-and-operator-ux.md)
+- [Observability and Hardening](06-observability-and-hardening.md)
 
 ## Milestones
 
@@ -53,7 +74,10 @@ Outcome:
 
 - repo skeleton exists
 - `mise` is the operator entrypoint
+- project-level OpenCode config, agents, and skills are committed to the repo
 - `hk` and `fnox` conventions are in place
+- QMD discovery is repo-managed and refreshable through `mise`
+- docs refresh automation exists for active docs work
 - formatting, linting, typechecking, build, and validation task surfaces are documented
 
 ### Milestone 2: VM Bootstrap
@@ -121,4 +145,4 @@ Outcome:
 
 - keep this file summary-oriented and stable
 - move execution details into the numbered plan files
-- record lasting architecture choices in `docs/adr/`, not in plan files
+- record lasting architecture choices in [the ADR set](../adr/README.md), not in plan files

@@ -1,7 +1,30 @@
-# ADR-0006: Session Index Stack and API Boundary
+---
+title: "ADR-0006: Session Index Stack and API Boundary"
+doc_id: "ADR-0006"
+doc_type: "adr"
+status: "accepted"
+date: "2026-03-08"
+updated: "2026-03-09"
+summary: "Use a Go backend, thin TypeScript frontend, and explicit API contract before UI implementation for the session index."
+aliases:
+  - "Session Index Stack and API Boundary"
+tags:
+  - "adr"
+  - "session-index"
+  - "api"
+  - "go"
+  - "typescript"
+source_of_truth: "durable-decision"
+related_docs:
+  - "docs/specs/platform/tech-spec.md"
+  - "docs/specs/platform/session-index-api.md"
+  - "docs/specs/platform/session-index-ux.md"
+  - "docs/plans/05-session-index-and-operator-ux.md"
+supersedes: []
+superseded_by: []
+---
 
-- Status: Accepted
-- Date: 2026-03-08
+# ADR-0006: Session Index Stack and API Boundary
 
 ## Context
 
@@ -83,5 +106,5 @@ Not chosen as the default because:
 
 ## Follow-Up
 
-- define the detailed API contract in `docs/specs/platform/session-index-api.md`
-- define the detailed UI model in `docs/specs/platform/session-index-ux.md`
+- define the detailed API contract in [Session Index API](../specs/platform/session-index-api.md)
+- define the detailed UI model in [Session Index UX](../specs/platform/session-index-ux.md)

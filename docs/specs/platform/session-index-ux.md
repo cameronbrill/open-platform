@@ -1,11 +1,39 @@
-# Session Index UX
+---
+title: "Session Index UX"
+doc_id: "SPEC-PLATFORM-UX-001"
+doc_type: "spec"
+status: "draft"
+date: "2026-03-08"
+updated: "2026-03-09"
+summary: "Operator-facing UX model, states, and responsive behavior for the session index."
+aliases:
+  - "Session UX"
+  - "Session Index UX"
+tags:
+  - "spec"
+  - "ux"
+  - "session-index"
+  - "operator-console"
+source_of_truth: "implementation-requirements"
+related_docs:
+  - "docs/specs/platform/tech-spec.md"
+  - "docs/specs/platform/session-index-api.md"
+  - "docs/adr/0006-session-index-stack-and-api-boundary.md"
+  - "docs/plans/05-session-index-and-operator-ux.md"
+---
 
-- Status: Draft
-- Date: 2026-03-08
+# Session Index UX
 
 ## Purpose
 
 Define the operator experience for the session index without expanding it into a second session client.
+
+## Related Documents
+
+- [Open Platform Technical Specification](tech-spec.md)
+- [Session Index API](session-index-api.md)
+- [ADR-0006: Session Index Stack and API Boundary](../../adr/0006-session-index-stack-and-api-boundary.md)
+- [Session Index and Operator UX Plan](../../plans/05-session-index-and-operator-ux.md)
 
 ## Product Role
 
@@ -60,7 +88,7 @@ The UI should support at least these states:
 - action in progress
 - failed action
 
-Per-session states should match the status model defined in `session-index-api.md`.
+Per-session states should match the status model defined in [Session Index API](session-index-api.md).
 
 ## Error and Recovery UX
 
