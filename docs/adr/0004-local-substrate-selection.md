@@ -1,7 +1,29 @@
-# ADR-0004: Local Substrate Selection
+---
+title: "ADR-0004: Local Substrate Selection"
+doc_id: "ADR-0004"
+doc_type: "adr"
+status: "proposed"
+date: "2026-03-08"
+updated: "2026-03-09"
+summary: "Select the supported v1 local substrate matrix across hypervisor, VM networking, minikube driver, and Kata viability."
+aliases:
+  - "Local Substrate Selection"
+tags:
+  - "adr"
+  - "substrate"
+  - "minikube"
+  - "kata"
+  - "networking"
+source_of_truth: "durable-decision"
+related_docs:
+  - "docs/specs/platform/tech-spec.md"
+  - "docs/plans/02-vm-bootstrap.md"
+  - "docs/plans/03-cluster-network-and-kata.md"
+supersedes: []
+superseded_by: []
+---
 
-- Status: Proposed
-- Date: 2026-03-08
+# ADR-0004: Local Substrate Selection
 
 ## Context
 
