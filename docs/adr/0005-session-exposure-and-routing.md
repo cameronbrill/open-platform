@@ -2,10 +2,10 @@
 title: "ADR-0005: Session Exposure and Routing"
 doc_id: "ADR-0005"
 doc_type: "adr"
-status: "proposed"
+status: "accepted"
 date: "2026-03-08"
 updated: "2026-03-09"
-summary: "Define how session URLs are resolved and exposed while keeping v1 localhost-only and future remote access compatible."
+summary: "Use backend-owned host-based routing on *.localhost for per-session opencode web endpoints, require per-session auth in v1, and keep the open-session contract compatible with a future authenticated gateway."
 aliases:
   - "Session Exposure and Routing"
 tags:
@@ -18,7 +18,9 @@ source_of_truth: "durable-decision"
 related_docs:
   - "docs/specs/platform/tech-spec.md"
   - "docs/specs/platform/session-index-api.md"
+  - "docs/specs/platform/session-index-ux.md"
   - "docs/plans/04-session-runtime.md"
+  - "docs/plans/05-session-index-and-operator-ux.md"
 supersedes: []
 superseded_by: []
 ---
@@ -36,20 +38,50 @@ Routing choices affect:
 - the thin session index application
 - future remote access
 
-## Proposed Direction
+## Decision
 
-The platform should establish a stable session identity and a backend-owned URL resolution contract before implementation is finalized.
+Use the following v1 routing and exposure contract:
 
-Requirements:
-
-- session URLs must be resolved by trusted backend logic rather than hand-constructed in the client
-- session endpoints remain localhost-only in v1
+- each session has a stable backend-owned session identity
+- each session is exposed through host-based routing on a `*.localhost` hostname
+- the backend, not the frontend, resolves the canonical operator-visible `openUrl`
+- v1 browser access remains localhost-only through the substrate and forwarding model chosen in [ADR-0004](0004-local-substrate-selection.md)
 - per-session auth remains required in v1
-- future remote access must terminate through a dedicated gateway boundary rather than direct unauthenticated exposure
+- the session index may surface access metadata and auth state, but must not become a general-purpose secret vault
 
-Path-based routing may be used only if it works cleanly with `opencode web`. If not, host-based routing is preferred over brittle path rewriting.
+## Open-Session Contract Rules
+
+- the frontend must never construct session URLs by guessing hostnames or paths
+- `GET /sessions/{id}/open` is the canonical route-resolution surface for the operator UI
+- if a session is not ready, the backend returns a normalized not-ready response instead of a speculative open target
+- auth failures must be distinguishable from session startup or substrate failures in operator-visible behavior
+
+## Future Gateway Compatibility Rules
+
+- future remote access must terminate through a dedicated authenticated gateway layer
+- internal session identity must remain stable even if the future external URL shape changes
+- the gateway may mint or broker future access credentials, but the session index contract should not need redesign to support that layer
+- direct unauthenticated exposure of per-session endpoints is not allowed
+
+## Rationale
+
+- host-based routing avoids brittle path rewriting against `opencode web`
+- `*.localhost` keeps the v1 URL shape compatible with localhost-only access and future host-based gateway mapping
+- backend-owned URL resolution prevents contract drift and frontend guesswork
+
+## Consequences
+
+### Positive
+
+- one stable routing contract now exists for the runtime plan, API spec, and UX spec
+- the frontend can consume a typed open-session contract instead of inventing routing logic
+
+### Negative
+
+- ingress, forwarding, and local hostname behavior must be verified carefully
+- per-session auth and host-based exposure require clear non-leaking operator behavior
 
 ## Follow-Up
 
-- finalize path-based vs host-based routing after `opencode web` validation
-- document how the session index computes or resolves operator-visible open URLs
+- define typed request, response, status, and error behavior in [Session Index API](../specs/platform/session-index-api.md)
+- define operator-visible auth/open-session behavior in [Session Index UX](../specs/platform/session-index-ux.md)

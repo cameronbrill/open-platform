@@ -5,7 +5,7 @@ doc_type: "plan"
 status: "draft"
 date: "2026-03-08"
 updated: "2026-03-09"
-summary: "OTEL, Better Stack, telemetry redaction, RBAC hardening, and final v1 security validation."
+summary: "Finalize OTEL, Better Stack export, telemetry redaction, RBAC hardening, and final v1 security verification."
 aliases:
   - "Plan 06"
   - "Observability and Hardening Plan"
@@ -16,9 +16,9 @@ tags:
   - "security"
   - "hardening"
 source_of_truth: "execution-plan"
-scope: "OTEL, Better Stack, telemetry redaction, RBAC hardening, auth leakage prevention, and localhost-only verification"
+scope: "final observability verification, telemetry redaction, RBAC hardening, auth leakage prevention, and localhost-only validation"
 depends_on:
-  - "docs/plans/05-session-index-and-operator-ux.md"
+  - "docs/plans/04-session-runtime.md"
 blocks:
   - "v1 completion"
 related_docs:
@@ -26,7 +26,6 @@ related_docs:
   - "docs/specs/platform/repository-tooling.md"
   - "docs/specs/platform/testing-strategy.md"
   - "docs/specs/platform/tech-spec.md"
-  - "docs/plans/04-session-runtime.md"
   - "docs/plans/05-session-index-and-operator-ux.md"
 ---
 
@@ -34,7 +33,9 @@ related_docs:
 
 ## Purpose
 
-Finish v1 by adding observability and validating the security posture.
+Finalize and verify v1 observability and security posture after runtime behavior exists.
+
+Preparatory instrumentation may begin after Plan 04 exposes stable runtime events. Final signoff depends on the operator-visible auth, error, and recovery behavior completed in Plan 05.
 
 ## In Scope
 
@@ -47,12 +48,6 @@ Finish v1 by adding observability and validating the security posture.
 - localhost-only verification
 - final smoke validation against acceptance criteria
 
-## Out of Scope
-
-- self-hosted observability
-- public or remote access gateway
-- multi-user auth
-
 ## Deliverables
 
 - `cluster/observability/otel-collector.yaml`
@@ -60,25 +55,25 @@ Finish v1 by adding observability and validating the security posture.
 - `telemetry/betterstack/dashboards.md`
 - `telemetry/betterstack/alerts.md`
 - RBAC manifests
-- final smoke tests
+- final smoke and security regression docs or suites
+- incident and recovery notes for telemetry or hardening failures
 
 ## Tasks
 
 ### Observability
 
-- deploy OTEL collector
+- deploy the OTEL collector
 - instrument operator-visible lifecycle events
 - instrument API and session-index action failures
-- wire Better Stack export
+- prove redaction locally before enabling external export
+- wire Better Stack export only after that proof exists
 - create baseline dashboards and alerts
 
-### Telemetry Data Policy
+### Telemetry Data Policy Verification
 
-- enforce redaction rules
 - confirm secrets and raw session content are not exported by default
-- confirm auth or password data does not leak through URLs, logs, or telemetry
+- confirm auth or password data does not leak through URLs, logs, cookies, or telemetry
 - document what is and is not sent
-- treat Infisical scanning as complementary to, not a replacement for, runtime leak prevention
 
 ### Hardening
 
@@ -92,23 +87,13 @@ Finish v1 by adding observability and validating the security posture.
 
 - define which checks belong to integration tests, platform smoke tests, and security regressions
 - keep these slower verification layers separate from the fast local loop
-- Tilt may optionally assist repeated slow verification, but must not replace `mise` workflows
-- Buildkite should run or schedule the documented slower security and observability suites
+- ensure Buildkite can run or schedule the documented slower security and observability suites when required
 
-Minimum required security regressions should include:
+### Failure Response
 
-- unauthorized or malformed open-session attempts
-- secret leakage checks for logs, URLs, and telemetry
-- localhost-only exposure verification
-- deny-by-default egress and blocked lateral movement checks
-- absence of unnecessary Kubernetes API credentials in session pods
-
-### Final Validation
-
-- run acceptance-criteria smoke tests
-- validate auth-open flow and failure handling
-- record remaining gaps as follow-up work
-- explicitly cover localhost-only exposure, network policy behavior, auth leakage, and telemetry redaction
+- define what to do if telemetry export leaks sensitive content
+- define what to do if collector export fails
+- define what to do if a hardening regression fails late in the milestone
 
 ## Validation
 
@@ -117,15 +102,10 @@ Minimum required security regressions should include:
 - localhost-only behavior is confirmed
 - final acceptance criteria can be demonstrated
 - slower platform verification suites confirm the expected security and observability behaviors
-- dependency-update PRs are expected to pass the same relevant CI and security gates
 
 ## Exit Criteria
 
 - v1 security and observability assumptions are tested
+- no external telemetry export is enabled before redaction proof exists
 - the platform is ready for real use as a single-user localhost-only system
-- follow-up work for remote access or future refinements is clearly separated
 - slow verification loops exist independently of fast local tests
-
-## Risks / Notes
-
-- if observability requires exporting too much raw session data, stop and redesign the telemetry scope before calling v1 done

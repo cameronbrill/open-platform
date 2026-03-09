@@ -5,7 +5,7 @@ doc_type: "adr"
 status: "accepted"
 date: "2026-03-08"
 updated: "2026-03-09"
-summary: "Define how secrets are fetched through fnox and materialized at runtime as late as possible."
+summary: "Materialize secrets as late as possible through task-mediated workflows, keep them narrowly scoped, and clean them up when sessions or workflows end."
 aliases:
   - "Runtime Secret Materialization"
 tags:
@@ -17,6 +17,8 @@ tags:
 source_of_truth: "durable-decision"
 related_docs:
   - "docs/adr/0002-secret-bootstrap-and-local-secret-ux.md"
+  - "docs/adr/0008-infisical-secret-management-and-ci-auth.md"
+  - "docs/specs/platform/secret-management.md"
   - "docs/specs/platform/tech-spec.md"
   - "docs/plans/04-session-runtime.md"
 supersedes: []
@@ -27,24 +29,41 @@ superseded_by: []
 
 ## Context
 
-The platform needs a clear and safe way to move secrets from the operator-controlled secret backend into runtime components such as session pods, the index backend, and observability configuration.
+The platform needs a clear and safe way to move secrets from the operator-controlled backend into runtime components such as session pods, the index backend, and observability configuration.
 
 ## Decision
 
-Runtime secret materialization follows these rules:
+Runtime secret materialization follows these lifecycle rules.
 
-- secret values are fetched through `fnox` during task execution
-- secrets are materialized as late as possible
+### 1. Retrieval
+
+- local operator workflows retrieve secret values through repo-declared `fnox` mappings backed by `Infisical`
+- CI may authenticate directly to `Infisical` when that is the documented machine-oriented path
+- secret retrieval remains behind documented `mise` workflows, not ad hoc shell exports as the supported interface
+
+### 2. Injection
+
+- secret values are materialized as late as possible
+- injection should prefer short-lived environment variables, short-lived files, or narrowly scoped Kubernetes `Secret` objects only when required
 - secret values must not be stored in `nix`, committed manifests, image layers, or long-lived repo-managed files
-- per-session secrets should be unique when possible, especially for session auth
-- persistent Kubernetes `Secret` objects are allowed only when necessary and should be scoped as narrowly as possible
-- secret material should be deleted or invalidated when the owning session or workflow is destroyed
 
-Preferred v1 behavior:
+### 3. In-Session Use
 
-- operator runs a `mise` task
-- task retrieves values through `fnox`
-- task injects values into runtime via short-lived environment variables, ephemeral files, or narrowly scoped Kubernetes `Secret` objects when unavoidable
+- per-session secrets should be unique when practical, especially for session auth
+- the session index API and UX may expose auth state or access requirements, but must not become a general-purpose secret vault
+- secret values must not appear in session URLs, index API payloads, frontend bundles, logs, telemetry, crash diagnostics, or workspace storage
+
+### 4. Restart And Rotation
+
+- restart flows must recreate or revalidate any session-scoped secret material that should not survive the restart
+- rotation and revocation behavior must be defined in the living secret-management spec
+- no shared long-lived session password across all sessions is allowed as the default pattern
+
+### 5. Delete And Reset Cleanup
+
+- secret material must be deleted or invalidated when the owning session or workflow is destroyed
+- any Kubernetes `Secret` object created for runtime use must remain narrowly scoped and must be removed during teardown when it is no longer needed
+- delete and reset flows must not leave behind reusable session credentials or orphaned secret objects
 
 ## Rationale
 
@@ -54,24 +73,12 @@ Preferred v1 behavior:
 
 ## Guardrails
 
-- no plaintext secret values in logs, telemetry, URLs, or crash diagnostics
+- no plaintext secret values in logs, telemetry, URLs, crash diagnostics, or workspace files
 - no secret values baked into static assets or frontend bundles
-- no shared long-lived session password across all sessions by default
 - no default service account tokens mounted into session pods
-
-## Consequences
-
-### Positive
-
-- predictable secret lifecycle
-- stronger separation between secret storage and runtime execution
-
-### Negative
-
-- task orchestration becomes more important because secret flow is not fully transparent to raw commands
-- some Kubernetes workflows are slightly more complex because secret scope and cleanup must be explicit
+- no secret-bearing API responses where non-secret auth metadata is sufficient
 
 ## Follow-Up
 
-- align final session auth behavior with session-routing and browser auth decisions
-- define retention and secure deletion rules in the tech spec
+- operational naming, rotation, revocation, and failure handling live in [Secret Management](../specs/platform/secret-management.md)
+- auth and open-session contract detail lives in [Session Index API](../specs/platform/session-index-api.md) and [Session Index UX](../specs/platform/session-index-ux.md)

@@ -2,10 +2,10 @@
 title: "ADR-0001: Local Autonomous Coding Platform Architecture"
 doc_id: "ADR-0001"
 doc_type: "adr"
-status: "proposed"
+status: "accepted"
 date: "2026-03-08"
 updated: "2026-03-09"
-summary: "Adopt the Windows host plus NixOS VM, minikube, Kata, per-session opencode web endpoints, and Better Stack architecture for the single-user localhost-only v1 platform."
+summary: "Adopt the Windows host plus Hyper-V hosted NixOS VM, minikube, Kata, per-session opencode web endpoints, backend-owned host-based routing, and Better Stack architecture for the single-user localhost-only v1 platform."
 aliases:
   - "Platform Architecture"
   - "Local Autonomous Coding Platform Architecture"
@@ -18,9 +18,16 @@ tags:
 source_of_truth: "durable-decision"
 related_docs:
   - "docs/specs/platform/tech-spec.md"
+  - "docs/specs/platform/secret-management.md"
+  - "docs/specs/platform/repository-tooling.md"
   - "docs/specs/platform/testing-strategy.md"
   - "docs/plans/initial-implementation-plan.md"
+  - "docs/adr/0004-local-substrate-selection.md"
+  - "docs/adr/0005-session-exposure-and-routing.md"
+  - "docs/adr/0008-infisical-secret-management-and-ci-auth.md"
   - "docs/adr/0007-testing-strategy-and-inner-feedback-loops.md"
+  - "docs/adr/0009-monorepo-toolchain-pnpm-nx-and-nx-go.md"
+  - "docs/adr/0010-repository-automation-buildkite-and-renovate.md"
 supersedes: []
 superseded_by: []
 ---
@@ -54,10 +61,10 @@ Additional operating assumptions:
 
 ## Decision
 
-Adopt the following architecture:
+Adopt the following v1 architecture:
 
 - `Windows 11` host for desktop UX, browser, Zed, and gaming.
-- `NixOS VM` as the declarative Linux control plane.
+- `Hyper-V` hosted `NixOS VM` as the declarative Linux control plane.
 - `minikube` inside the VM as the local cluster.
 - `Kata Containers` for isolated OpenCode session pods.
 - one `opencode web` endpoint per session.
@@ -69,6 +76,8 @@ Adopt the following architecture:
 - `fnox` for declarative local secret UX, backed by `Infisical`.
 - behavior-focused TDD for repo-owned code and contracts.
 - `mise` as the public entrypoint for validation and testing workflows.
+
+The detailed substrate matrix is fixed by [ADR-0004](0004-local-substrate-selection.md). The detailed exposure and routing contract is fixed by [ADR-0005](0005-session-exposure-and-routing.md).
 
 The platform is explicitly single-user in v1. All browser-facing surfaces are localhost-only by default. Future remote access must be supported by adding a dedicated authenticated gateway layer without redesigning the internal session model.
 
@@ -183,22 +192,27 @@ Kata-based isolation is treated as one containment layer, not a complete securit
 
 ## Secret Bootstrap Model
 
-The v1 bootstrap model is operator-mediated.
+The active secret system is defined by [ADR-0008](0008-infisical-secret-management-and-ci-auth.md) and the living [Secret Management](../specs/platform/secret-management.md) spec.
+
+Architecture-level rules:
 
 - `Infisical` is the source of truth for secret values.
-- `fnox` is the repo-facing declarative secret UX layer for local workflows.
+- `fnox` remains the repo-facing local declarative UX layer.
 - `mise` is the only supported public path for secret-aware task execution.
 - secret values must not be stored in `nix`, `.env` files, shell profiles, or committed manifests.
 - v1 does not rely on long-lived exported secret material stored in repo-managed VM artifacts.
 
 ## Runtime Secret Materialization Policy
 
-- secrets are fetched through `fnox` during local task execution, backed by `Infisical`
+Detailed lifecycle rules live in [ADR-0003](0003-runtime-secret-materialization.md) and [Secret Management](../specs/platform/secret-management.md).
+
+Architecture-level rules:
+
 - secrets are materialized as late as possible
 - per-session secrets should be unique when possible, especially for session auth
 - persistent Kubernetes `Secret` objects are allowed only when needed and should remain narrowly scoped
 - secret material should be deleted or invalidated when the owning session or workflow is destroyed
-- secret values must not appear in logs, telemetry, URLs, or debug dumps
+- secret values must not appear in logs, telemetry, URLs, index API payloads, or debug dumps
 
 ## Access Model
 
@@ -212,10 +226,10 @@ v1 access assumptions:
 
 ### Browser Authentication in v1
 
-- session endpoints must require auth in v1
+- session endpoints must require per-session auth in v1
 - the session index must not become a general-purpose secret vault
 - auth failures should be distinguishable from session startup failures in operator-visible UX
-- session auth handling must remain compatible with a future authenticated gateway
+- session auth handling and open-session URL resolution must remain compatible with a future authenticated gateway
 
 ### Future Remote-Access Boundary Contract
 
@@ -252,9 +266,9 @@ Requirements:
 
 ## Networking Substrate Decision
 
-The chosen local Kubernetes networking stack must support enforced `NetworkPolicy`.
+The concrete substrate matrix is defined in [ADR-0004](0004-local-substrate-selection.md).
 
-Requirements:
+Architecture requirements:
 
 - session workloads default to deny-all network posture except for explicitly allowed egress
 - localhost-only access is the default external exposure mode in v1
@@ -299,15 +313,15 @@ Detailed artifact trust and update policy lives in the tech spec.
 
 ## Tool Ownership
 
-Tool responsibilities are intentionally separated:
+Durable toolchain and automation choices are recorded in [ADR-0009](0009-monorepo-toolchain-pnpm-nx-and-nx-go.md) and [ADR-0010](0010-repository-automation-buildkite-and-renovate.md). Living operational detail belongs in [Repository Tooling](../specs/platform/repository-tooling.md).
+
+Architecture-level ownership remains:
 
 - `nix` owns system configuration, system packages, and long-lived machine or service definitions
-- `mise` owns developer-facing tasks, build and validation entrypoints, and repo-level orchestration
-- `fnox` owns the declarative local secret UX and task integration
+- `mise` owns the public task surface
+- `fnox` owns local declarative secret UX behavior beneath `mise`
 - `hk` owns local hook execution policy
-- `dprint` is the public formatting entrypoint and orchestrates underlying formatters
-
-Scripts are implementation details and should not be the primary public interface.
+- scripts are implementation details rather than the public interface
 
 ## Consequences
 
@@ -405,14 +419,14 @@ Recovery flows must be documented and must not require ad hoc manual debugging a
 - one Kata-backed OpenCode session works end-to-end
 - session pods run with `runtimeClassName: kata`
 - session pods do not receive unnecessary Kubernetes API credentials by default
-- the session index page can link to live `opencode web` endpoints
+- the session index page opens sessions only through backend-resolved URLs and documented contract behavior
 - all browser-facing surfaces are localhost-only by default in v1
 - `NetworkPolicy` deny-by-default behavior is validated by smoke tests
 - telemetry reaches Better Stack without exporting secrets or raw session content by default
 - the platform documents an explicit API contract before implementing the session index UI
 - the platform documents a strict typing policy for Go and TypeScript code
 - secret values are not stored in `nix`, committed manifests, or repo-managed `.env` files
-- the formatting, linting, typechecking, build, and validation command surface is documented through `mise`
+- the public formatting, linting, typechecking, build, and validation command surface is documented through `mise`
 - a documented layered testing strategy exists and treats contracts as first-class test artifacts
 - fast local behavior tests do not require full cluster bring-up
 - slower platform verification exists for localhost-only exposure, network policy, auth handling, and telemetry redaction

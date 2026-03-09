@@ -24,7 +24,6 @@ source_docs:
   - "docs/specs/platform/tech-spec.md"
 related_docs:
   - "docs/plans/README.md"
-  - "docs/adr/0001-platform-architecture.md"
   - "docs/specs/platform/secret-management.md"
   - "docs/specs/platform/repository-tooling.md"
   - "docs/specs/platform/testing-strategy.md"
@@ -37,29 +36,17 @@ related_docs:
 
 Provide the high-level execution roadmap for implementing v1 of the platform.
 
-This file is intentionally roadmap-oriented. Detailed execution lives in the numbered plans listed in the [Plans Index](README.md).
-
 ## In Scope
 
 - sequencing the numbered implementation plans
-- defining milestone boundaries
-- showing dependencies and exit criteria between plans
+- defining milestone boundaries and decision gates
+- showing dependencies and overlap rules between plans
 
 ## Out of Scope
 
-- step-by-step implementation details that live in numbered plans
+- step-by-step implementation detail that lives in numbered plans
 - operator-only manual setup details
-- recording architecture decisions that belong in [the ADR set](../adr/README.md)
-
-## Plan Set
-
-- [Operator Prerequisites](00-operator-prerequisites.md)
-- [Repo Foundations](01-repo-foundations.md)
-- [VM Bootstrap](02-vm-bootstrap.md)
-- [Cluster Network and Kata](03-cluster-network-and-kata.md)
-- [Session Runtime](04-session-runtime.md)
-- [Session Index and Operator UX](05-session-index-and-operator-ux.md)
-- [Observability and Hardening](06-observability-and-hardening.md)
+- recording durable architecture decisions that belong in ADRs
 
 ## Milestones
 
@@ -68,68 +55,63 @@ This file is intentionally roadmap-oriented. Detailed execution lives in the num
 Outcome:
 
 - manual host, account, and secret prerequisites are complete
-- Infisical backend access works for the operator and CI prerequisites are available
-- local declarative `fnox` secret workflows are ready for repo use
-- blocking choices are captured in ADRs or explicitly deferred
+- the selected substrate assumptions are supportable on the operator machine
+- Infisical local access and CI bootstrap prerequisites are available
+- blocking deviations are recorded before implementation continues
 
-### Milestone 1: Repo and Workflow Foundations
+### Milestone 1: Repo And Workflow Foundations
 
 Outcome:
 
 - repo skeleton exists
-- `mise` is the operator entrypoint
-- `pnpm`, `Nx`, and `@nx-go/nx-go` repo conventions are established
-- project-level OpenCode config, agents, and skills are committed to the repo
-- `hk`, Infisical secret scanning, declarative `fnox` secret UX, Buildkite, and Renovate foundations are in place
-- QMD discovery is repo-managed and refreshable through `mise`
-- docs refresh automation exists for active docs work
-- formatting, linting, typechecking, build, and validation task surfaces are documented
-- the layered testing strategy and fast/slow feedback loops are documented
+- `mise` is the public entrypoint
+- `pnpm`, `Nx`, `@nx-go/nx-go`, hooks, Buildkite, Renovate, and docs discovery foundations are in place
+- the fast-loop command surface is documented and usable
+- API, UX, tooling, secret, and testing specs exist as active current-truth docs
 
 ### Milestone 2: VM Bootstrap
 
 Outcome:
 
-- reproducible `NixOS` VM exists
-- operator can access and rebuild it reliably
-- Go and TypeScript build prerequisites exist in the supported operator path
+- reproducible `NixOS` VM exists on the selected Hyper-V path
+- operator can access, rebuild, and recover the VM reliably
+- nested-virtualization viability is confirmed early enough to block later work if needed
 
-### Milestone 3: Cluster, Network, and Kata
+### Milestone 3: Cluster, Network, And Kata
 
 Outcome:
 
-- `minikube` is reproducible
-- localhost exposure assumptions are verified
-- `NetworkPolicy` enforcement is verified
-- Kata works with a test workload or is blocked by an explicit decision
+- `minikube` on the selected substrate is reproducible
+- Calico policy enforcement is verified
+- ingress-nginx and localhost-only forwarding assumptions are verified
+- Kata works with a test workload on the supported matrix or implementation stops behind an explicit replacement decision
 
 ### Milestone 4: Session Runtime
 
 Outcome:
 
-- one isolated OpenCode session runs in Kubernetes
-- a local browser can reach one authenticated `opencode web` session
-- runtime secret flow and per-session auth behavior are documented and working
-- runtime behavior tests exist for the session lifecycle
+- one isolated OpenCode session runs end to end
+- a local browser can reach one authenticated `opencode web` session through the approved host-based routing model
+- runtime secret flow, per-session auth bootstrap behavior, and workspace cleanup behavior are documented and working
+- runtime recovery and doctor/reset behavior exist for the next milestone to consume
 
-### Milestone 5: Session Index and Operator UX
-
-Outcome:
-
-- operator can create, open, inspect, and delete sessions through supported flows
-- the session API contract, state model, and UX spec are documented before implementation coupling grows
-- recovery commands exist for common failure cases
-- API contract tests and UI behavior tests exist for the session index boundary
-
-### Milestone 6: Observability and Hardening
+### Milestone 5: Session Index And Operator UX
 
 Outcome:
 
-- OTEL and Better Stack are wired
-- telemetry redaction is enforced
-- localhost-only, least-privilege, and auth leakage assumptions are validated
-- slower platform and security regression suites exist for critical guarantees
-- Buildkite-backed slow validation and dependency-update gates are in place
+- operator can create, open, inspect, restart, and delete sessions through supported flows
+- implementation follows the approved API and UX specs rather than inventing a parallel contract
+- recovery guidance exists for common session failures
+- contract tests and operator-visible UI behavior tests exist for the session index boundary
+
+### Milestone 6: Observability And Hardening
+
+Outcome:
+
+- OTEL and Better Stack export are wired only after redaction proof exists
+- telemetry redaction, localhost-only behavior, least privilege, and auth non-leakage assumptions are validated
+- slower platform, observability, and security regression suites exist for critical guarantees
+- final recovery and incident guidance exists for supported v1 use
 
 ## Milestone Dependency Graph
 
@@ -137,26 +119,25 @@ Outcome:
 - `01-repo-foundations.md` blocks `02` through `06`
 - `02-vm-bootstrap.md` blocks `03` through `06`
 - `03-cluster-network-and-kata.md` blocks `04` through `06`
-- `04-session-runtime.md` blocks `05` and `06`
-- `05-session-index-and-operator-ux.md` and `06-observability-and-hardening.md` can overlap after `04`
+- `04-session-runtime.md` blocks `05` and enables preparatory observability work for `06`
+- `05-session-index-and-operator-ux.md` supplies final operator-visible behavior needed for `06` signoff
+
+## Overlap Rules
+
+- Plan 06 may start preparatory instrumentation work after Plan 04 produces stable runtime events
+- Plan 06 is not complete until Plan 05 finishes the final operator-visible auth, error, and recovery flows
 
 ## v1 Done Definition
 
 - one operator can bring the platform up locally
-- one Kata-backed session is reachable in a browser
+- one Kata-backed session is reachable in a browser through the supported localhost-only path
 - session lifecycle is manageable through supported commands and the index page
 - observability works without exporting sensitive content by default
-- localhost-only security posture is verified
+- localhost-only security posture and deny-by-default networking are verified
 - the API boundary between backend and frontend is documented before UI implementation
-- build, lint, typecheck, format, and validation commands are documented through `mise`
-- package management, orchestration, CI, dependency automation, and secret scanning are documented through living specs
+- build, lint, typecheck, format, docs refresh, and validation commands are documented through `mise`
+- package management, orchestration, CI, dependency automation, and secret handling are documented through living specs
 - fast local behavior tests exist for repo-owned code and contracts
 - slower platform verification exists for environment-sensitive behaviors
-- Tilt remains optional and is not required for v1 completion
+- doctor, reset, and recovery guidance exists for the supported failure path
 - the design is ready for a later authenticated remote-access layer
-
-## Risks / Notes
-
-- keep this file summary-oriented and stable
-- move execution details into the numbered plan files
-- record lasting architecture choices in [the ADR set](../adr/README.md), not in plan files

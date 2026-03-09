@@ -55,7 +55,6 @@ The session index follows a strict v1 boundary:
 ## Related Documents
 
 - [ADR-0001: Local Autonomous Coding Platform Architecture](../../adr/0001-platform-architecture.md)
-- [ADR-0002: Secret Bootstrap and Local Secret UX](../../adr/0002-secret-bootstrap-and-local-secret-ux.md)
 - [ADR-0003: Runtime Secret Materialization](../../adr/0003-runtime-secret-materialization.md)
 - [ADR-0004: Local Substrate Selection](../../adr/0004-local-substrate-selection.md)
 - [ADR-0005: Session Exposure and Routing](../../adr/0005-session-exposure-and-routing.md)
@@ -247,7 +246,7 @@ open-platform/
   - gaming host
   - browser
   - `Zed`
-  - hypervisor
+  - `Hyper-V`
 
 ### Linux Control Plane
 
@@ -262,7 +261,7 @@ open-platform/
   - `helm`
   - `k9s`
   - `minikube`
-  - reverse proxy or ingress support
+  - `ingress-nginx`
   - session index service
 
 ### Cluster Layer
@@ -270,7 +269,7 @@ open-platform/
 - `minikube`
   - session pods
   - `OpenTelemetry Collector`
-  - ingress and service resources
+  - `ingress-nginx`, service, and policy resources
   - resource quotas and policies
 
 ### Session Layer
@@ -628,29 +627,35 @@ Suggested v1 namespaces:
 
 ### CNI and NetworkPolicy Enforcement
 
-The selected local networking stack must support real `NetworkPolicy` enforcement.
+The supported v1 networking stack uses `Calico` for `NetworkPolicy` enforcement.
 
-The final substrate choice should document:
+Requirements:
 
-- CNI or equivalent networking path
-- how deny-by-default is enforced
-- how enforcement is smoke-tested
+- session workloads default to deny-all ingress and egress except for explicitly allowed paths
+- `Calico` policy enforcement must be validated by smoke tests, not assumed from manifest presence
+- policy smoke checks must prove both blocked traffic and explicitly allowed traffic
 
 ### Ingress Model
 
-The final substrate choice should document:
+The supported v1 ingress model uses `ingress-nginx` with host-based routing on `*.localhost`.
 
-- ingress/controller behavior
-- localhost-only exposure model in v1
-- compatibility with future authenticated remote access
+Requirements:
+
+- the index and per-session browser surfaces resolve through backend-owned hostnames, not client-guessed URLs
+- browser-facing traffic is exposed to the Windows host only through explicit localhost-only forwarding
+- no supported v1 path binds those browser surfaces directly to a LAN-facing interface
+- the hostname model remains compatible with a later authenticated gateway layer
 
 ### Storage Model
 
-The final platform should document:
+The supported v1 storage model uses local host-path-style workspace storage for session workspaces.
 
-- workspace storage type
-- PVC lifecycle and reclaim behavior
-- cleanup semantics on delete and reset
+Requirements:
+
+- session workspaces are isolated per session
+- delete removes the workspace for the deleted session
+- restart preserves or recreates the workspace according to the documented runtime policy for that action
+- cluster reset is destructive and removes local session state needed to return to a clean baseline
 
 ## Access Model
 
@@ -711,9 +716,16 @@ Session workloads should additionally follow a hardened runtime profile, includi
 
 Each session has its own `opencode web` endpoint.
 
-Routing options may include path-based or host-based routing, but the final choice must be validated against actual `opencode web` behavior and future gateway compatibility.
+The supported v1 routing model is host-based routing on `*.localhost`.
 
-The index backend, not the frontend, should own URL resolution for operator-visible open URLs.
+The index backend, not the frontend, owns URL resolution for operator-visible open URLs.
+
+Requirements:
+
+- `GET /sessions/{id}/open` is the canonical open-session resolution endpoint
+- the frontend must not guess hostnames or paths
+- open-session flows may rely on backend-managed HTTP-only cookie bootstrap or an equivalent non-secret transport
+- the open-session contract must not expose raw reusable credentials in JSON or URLs
 
 ## Session Index Application Architecture
 
@@ -741,19 +753,9 @@ The index backend, not the frontend, should own URL resolution for operator-visi
 
 ## Session Resource Shape
 
-Canonical operator-facing fields are defined in [Session Index API](session-index-api.md) and should include at least:
+Canonical operator-facing fields are defined in [Session Index API](session-index-api.md).
 
-- `id`
-- `name`
-- `repo`
-- `branch`
-- `status`
-- `createdAt`
-- `lastTransitionAt`
-- `url`
-- `authRequired`
-- `restartCount`
-- `failureReason`
+At this layer, the important rule is ownership: the API spec owns detailed field shape, normalized error envelopes, and status transition semantics.
 
 ## API Contract
 
@@ -771,22 +773,9 @@ The initial contract should support:
 
 ## Session Status Semantics
 
-The operator-visible state model should be stable and typed.
+The operator-visible state model is stable and typed.
 
-These statuses are behavior-level assertions for tests, not merely documentation labels.
-
-Expected statuses include:
-
-- `creating`
-- `pending_clone`
-- `starting`
-- `ready`
-- `degraded`
-- `restarting`
-- `deleting`
-- `failed`
-
-These statuses should be mapped by backend logic rather than directly exposing raw Kubernetes conditions to the UI.
+Detailed statuses and transitions live in [Session Index API](session-index-api.md). Backend logic maps raw runtime and Kubernetes behavior into those documented statuses instead of leaking raw infrastructure conditions to the UI.
 
 ## Session Index Page
 
@@ -811,21 +800,22 @@ At a minimum, the session index must define:
 3. repo is cloned into the session workspace
 4. pod starts under `runtimeClassName: kata`
 5. `opencode web` binds on the expected port
-6. service or ingress becomes reachable
+6. host-based ingress becomes reachable on the documented `*.localhost` pattern
 7. session appears as ready in the index page
 
 ### Delete
 
 1. session is selected for deletion
 2. pod, service, ingress, and related resources are removed
-3. workspace storage is cleaned up according to policy
+3. workspace storage and any session-scoped auth material are cleaned up according to policy
 4. lifecycle event is emitted to telemetry
 
 ### Restart
 
 1. session resources are recycled or recreated
 2. index page reflects transient state
-3. telemetry records restart cause and outcome
+3. session-scoped auth material is recreated or revalidated according to policy
+4. telemetry records restart cause and outcome
 
 ## Observability Design
 
@@ -867,13 +857,13 @@ Telemetry should prioritize operational visibility without exporting raw session
 
 ## Data Retention and Deletion Policy
 
-The platform should document retention for:
+The v1 retention policy is:
 
-- session workspaces
-- session logs
-- OTEL buffers
-- Better Stack retention settings
-- cleanup behavior for session delete and cluster reset
+- session workspaces persist only for the life of the session and are deleted on session delete
+- session restart follows the documented runtime policy and must not leave stale reusable session credentials behind
+- local OTEL buffers are temporary operational data and are cleared when the collector or cluster reset path recreates them
+- Better Stack retention is treated as an external-boundary setting and must be documented alongside observability setup
+- cluster reset is a destructive recovery action that removes local session state and returns the platform to a clean baseline
 
 ## Supply Chain and Artifact Trust Policy
 
@@ -951,10 +941,9 @@ Execution details live in:
 ## Risks and Open Questions
 
 - nested virtualization requirements for the chosen Kata path may need tuning
-- the exact substrate matrix still needs to be finalized in follow-on ADRs
-- final routing choice depends on `opencode web` validation
 - duplicate workflows may emerge if Tilt and `mise` drift apart
 - tests may become brittle if they assert implementation details rather than behaviors and contracts
+- local forwarding and cookie-bootstrap behavior need careful validation because the browser boundary is security-sensitive
 
 ## Acceptance Criteria
 
@@ -982,5 +971,6 @@ Execution details live in:
 - `mise run cluster:doctor` can identify common substrate or session failures
 - `mise run cluster:reset` can restore a clean local platform state
 - the frontend/backend API contract is documented before UI implementation
-- the session resource shape and status model are documented before UI implementation
+- the session resource shape, error envelope, and status model are documented before UI implementation
+- open-session behavior is backend-owned and does not expose raw reusable credentials in JSON or URLs
 - the architecture leaves room for a future authenticated remote-access layer without redesigning internal session identity or routing

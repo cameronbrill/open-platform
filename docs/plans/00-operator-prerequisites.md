@@ -5,7 +5,7 @@ doc_type: "plan"
 status: "draft"
 date: "2026-03-08"
 updated: "2026-03-09"
-summary: "Manual setup, accounts, and operator-owned decisions required before implementation begins."
+summary: "Manual setup, accounts, and operator-owned environment checks required before implementation begins."
 aliases:
   - "Plan 00"
   - "Operator Prerequisites Plan"
@@ -25,12 +25,11 @@ blocks:
   - "docs/plans/05-session-index-and-operator-ux.md"
   - "docs/plans/06-observability-and-hardening.md"
 related_docs:
-  - "docs/adr/README.md"
+  - "docs/adr/0004-local-substrate-selection.md"
+  - "docs/adr/0008-infisical-secret-management-and-ci-auth.md"
   - "docs/specs/platform/secret-management.md"
   - "docs/specs/platform/repository-tooling.md"
-  - "docs/specs/platform/testing-strategy.md"
   - "docs/specs/platform/tech-spec.md"
-  - "docs/plans/initial-implementation-plan.md"
 ---
 
 # Operator Prerequisites
@@ -41,85 +40,71 @@ List all manual work that must be completed by the operator before implementatio
 
 ## In Scope
 
-- host OS and hypervisor setup
-- BIOS or UEFI and Windows feature toggles
+- host OS, firmware, and Hyper-V readiness
 - account, credential, and secret setup that requires operator approval
-- storage and resource allocation choices
-- any manual confirmations required before running automation
+- storage and resource allocation choices for the selected matrix
+- manual environment checks that automation depends on
 
-## Out of Scope
+## Out Of Scope
 
-- recording architecture decisions directly in this file
+- recording new architecture decisions directly in this file
 - implementation steps that can be automated in repo tasks
-- cluster or app bootstrap work
 
-## Required Decisions Referenced Elsewhere
+## Operator-Owned Environment Gates
 
-- hypervisor choice
-- `minikube` driver choice
-- networking or CNI choice
-- ingress or routing preference
-- secret materialization approach
-- final localhost exposure mechanics
-
-These must be captured in [ADRs](../adr/README.md) when they become durable architecture choices.
+- confirm the operator machine can support the selected Hyper-V plus `NixOS` plus `minikube` plus Kata path
+- confirm disk, CPU, and RAM budgets are acceptable for the VM and cluster
+- record any local deviation that would break the supported matrix before implementation proceeds
 
 ## Manual Host Prerequisites
 
-### Windows and Firmware
+### Windows And Firmware
 
 - confirm virtualization is enabled in BIOS or UEFI
-- confirm required Windows virtualization features for the chosen hypervisor
-- confirm nested virtualization requirements for the VM path
+- confirm required Windows virtualization features for Hyper-V
+- confirm nested-virtualization support for the selected VM path
 - confirm available disk location for VM storage
 
-### Hypervisor Preparation
+### Hyper-V Preparation
 
-- install and configure the chosen hypervisor
+- install and configure Hyper-V
 - create or reserve VM storage location
 - decide CPU and RAM allocation range for the VM
-- confirm networking mode for the VM
+- confirm the NAT-style VM networking model needed by the selected substrate
 
-### Account and Secret Prerequisites
+### Account And Secret Prerequisites
 
-- create or access the Infisical organization, project, and environments needed for the repo
+- create or access the Infisical project and `dev` and `ci` environments needed for the repo
 - install and authenticate the `Infisical` CLI
 - confirm local secret access works from the intended operator environment
-- install or bootstrap `fnox` if it is required in the local operator path
+- install or bootstrap `fnox` for the local operator path
 - confirm repo-declared local secret workflows work through `fnox`
 - create or confirm model provider account and API credentials
 - create Better Stack account, sources, and tokens
-- decide password generation and storage approach for `OPENCODE_SERVER_PASSWORD`
 
 ### CI And Automation Prerequisites
 
 - create or confirm Buildkite organization and pipeline access
-- decide the Buildkite agent model needed for the repo
-- provision the Infisical CI auth/bootstrap mechanism
-
-### Frontend and Backend Preconditions
-
-- confirm the preferred stack direction: Go backend and TypeScript frontend
-- confirm that v1 uses an explicit API contract before UI implementation
-- confirm that v1 avoids SSR and avoids `React Router`
-- confirm `pnpm` as the Node package manager
-- confirm `Nx` as the orchestration and caching layer
-- confirm `@nx-go/nx-go` as the Go/Nx integration path
+- confirm the Buildkite agent model needed for the repo
+- provision the documented Infisical CI bootstrap path or machine-oriented auth prerequisite
 
 ### Operator Tooling Prerequisites
 
 - confirm local Git access strategy
 - confirm browser used for local access
-- confirm Zed usage mode if relevant later
 - confirm understanding of Windows host vs VM vs cluster locality
 - confirm understanding that `mise` is the supported validation and testing path
-- confirm that Tilt is optional and not a prerequisite
-- confirm understanding that Buildkite runs repo-owned tasks rather than defining a separate public workflow surface
+
+## Failure And Recovery Notes
+
+- if Hyper-V or firmware support is missing, stop before repo or VM work and record the blocker
+- if local Infisical access fails, fix that before repo scaffolding depends on it
+- if Buildkite bootstrap is incomplete, local work may continue only if CI-dependent milestones are not claimed complete
 
 ## Completion Checklist
 
 - [ ] virtualization is enabled
-- [ ] hypervisor is selected and installed
+- [ ] Hyper-V is installed and usable
 - [ ] VM resource budget is decided
 - [ ] model provider credentials are available in Infisical
 - [ ] Better Stack credentials are available in Infisical
@@ -127,15 +112,10 @@ These must be captured in [ADRs](../adr/README.md) when they become durable arch
 - [ ] local `fnox`-mediated secret workflows work
 - [ ] Buildkite prerequisites are available for CI setup
 - [ ] operator understands host vs VM vs cluster access model
-- [ ] blocking architecture decisions are captured in ADRs or explicitly deferred
+- [ ] blocking deviations from the supported matrix are recorded
 
 ## Exit Criteria
 
 - all required manual setup is complete
 - all blocking operator-owned credentials exist
-- all blocking architecture decisions are recorded or explicitly deferred
-
-## Risks / Notes
-
-- this file should be mostly frozen after completion
-- do not let this file become the source of truth for architecture decisions
+- the operator environment is ready for the supported matrix without undocumented assumptions

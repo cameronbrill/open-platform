@@ -5,7 +5,7 @@ doc_type: "adr"
 status: "accepted"
 date: "2026-03-09"
 updated: "2026-03-09"
-summary: "Adopt Infisical as the active secret backend, use fnox for declarative repo-driven local secret UX, and use Infisical for CI auth and pre-commit secret scanning."
+summary: "Adopt Infisical as the active secret backend, keep fnox as the declarative local UX layer, and use scoped machine-oriented CI auth and secret scanning."
 aliases:
   - "Infisical Secret Management ADR"
   - "fnox Secret UX ADR"
@@ -19,6 +19,7 @@ tags:
 source_of_truth: "durable-decision"
 related_docs:
   - "docs/specs/platform/secret-management.md"
+  - "docs/specs/platform/repository-tooling.md"
   - "docs/specs/platform/tech-spec.md"
   - "docs/plans/00-operator-prerequisites.md"
   - "docs/plans/01-repo-foundations.md"
@@ -41,71 +42,36 @@ The platform needs one current secret system that works for:
 ## Decision
 
 - `Infisical` is the active secret management backend and source of truth.
-- `fnox` provides the declarative repo-level secret UX for local secret-aware workflows.
-- CI authenticates to `Infisical` using a CI-appropriate machine identity or equivalent supported auth flow.
+- `fnox` provides the declarative repo-level local secret UX above that backend.
+- CI authenticates to `Infisical` using a scoped machine-oriented auth flow.
 - runtime secret delivery remains task-mediated.
-- `Infisical` is also used for pre-commit secret scanning.
+- `Infisical` is used for pre-commit secret scanning.
 
-## Decision Details
+## Boundary Rules
 
-### Local Operator Auth Model
+- `Infisical` owns secret storage, CI auth, and secret scanning capabilities
+- `fnox` owns repo-declared local secret mappings and secret-aware local execution behavior
+- `mise` remains the supported public path above both for normal repo workflows
 
-- local operator workflows use repo-declared `fnox` configuration backed by `Infisical`
-- repo tasks retrieve secrets through `fnox` for local secret-aware execution
-- committed `.env` files remain disallowed
+## CI Trust Rules
 
-### CI Auth Model
+- CI bootstrap credentials must remain minimal, rotated, auditable, and tightly scoped
+- untrusted or minimally trusted jobs must not receive broader secret access than their documented responsibilities require
+- CI may authenticate directly to `Infisical` even when local human workflows are mediated by `fnox`
 
-- CI uses a scoped machine-oriented auth flow
-- CI retrieves secrets at job runtime rather than baking them into pipeline definitions
-- CI bootstrap credentials must remain minimal, rotated, and tightly scoped
-- CI may authenticate directly to `Infisical` even if local operator workflows are mediated by `fnox`
+## Break-Glass Rules
 
-### Runtime Materialization
-
-- task-mediated materialization remains the runtime model
-- secrets are fetched late, scoped narrowly, and cleaned up when sessions or workflows end
-
-### Secret Scanning
-
-- staged secret scanning is required in pre-commit workflows
-- secret scanning complements, but does not replace, runtime leak prevention and telemetry redaction
+- direct `Infisical` CLI usage is allowed for documented operator bootstrap, recovery, or debugging paths
+- direct CLI usage is not the normal contributor workflow when repo-managed `fnox` plus `mise` paths exist
+- break-glass use must not become an undocumented replacement for the normal task-mediated model
 
 ## Rationale
 
 - one system for local and CI secret access reduces split-brain
 - `Infisical` fits unattended CI access better than a purely human-oriented vault flow
-- `fnox` provides the declarative, low-cognitive-load, repo-owned UX the operator wants for local work
-- keeping task-mediated runtime materialization avoids adding Kubernetes-side secret operators before they are needed
-
-## Consequences
-
-### Positive
-
-- cleaner local and CI secret model
-- one current source of truth for secret values
-- declarative secret requirements and mappings can live in the repo
-- simpler future path for automation and CI-backed validation
-
-### Negative
-
-- more operational complexity than a purely local human vault workflow
-- one additional local tool must be understood and maintained
-- CI bootstrap auth requires careful scoping and rotation
-
-## Alternatives Considered
-
-### Use direct `Infisical` CLI only
-
-- simpler toolchain on paper
-- weaker fit for declarative, repo-driven, low-cognitive-load local secret UX
-
-### Introduce Kubernetes-native secret delivery first
-
-- possible later
-- not necessary for the current task-mediated runtime model
+- `fnox` preserves the declarative, low-cognitive-load, repo-owned UX wanted for local work
 
 ## Follow-Up
 
-- operational details live in [Secret Management](../specs/platform/secret-management.md)
-- repo sequencing lives in [Operator Prerequisites](../plans/00-operator-prerequisites.md) and [Repo Foundations](../plans/01-repo-foundations.md)
+- operational naming, rotation, revocation, and runtime rules live in [Secret Management](../specs/platform/secret-management.md)
+- repo task-surface and CI execution detail live in [Repository Tooling](../specs/platform/repository-tooling.md)

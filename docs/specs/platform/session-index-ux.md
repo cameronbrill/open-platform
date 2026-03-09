@@ -16,12 +16,11 @@ tags:
   - "operator-console"
 source_of_truth: "implementation-requirements"
 related_docs:
-  - "docs/specs/platform/tech-spec.md"
-  - "docs/specs/platform/testing-strategy.md"
-  - "docs/specs/platform/session-index-api.md"
+  - "docs/adr/0005-session-exposure-and-routing.md"
   - "docs/adr/0006-session-index-stack-and-api-boundary.md"
-  - "docs/adr/0007-testing-strategy-and-inner-feedback-loops.md"
-  - "docs/plans/05-session-index-and-operator-ux.md"
+  - "docs/specs/platform/session-index-api.md"
+  - "docs/specs/platform/testing-strategy.md"
+  - "docs/specs/platform/tech-spec.md"
 ---
 
 # Session Index UX
@@ -31,15 +30,6 @@ related_docs:
 Define the operator experience for the session index without expanding it into a second session client.
 
 This document is also the source of truth for behavior-oriented UI tests.
-
-## Related Documents
-
-- [Open Platform Technical Specification](tech-spec.md)
-- [Testing Strategy](testing-strategy.md)
-- [Session Index API](session-index-api.md)
-- [ADR-0006: Session Index Stack and API Boundary](../../adr/0006-session-index-stack-and-api-boundary.md)
-- [ADR-0007: Testing Strategy and Inner Feedback Loops](../../adr/0007-testing-strategy-and-inner-feedback-loops.md)
-- [Session Index and Operator UX Plan](../../plans/05-session-index-and-operator-ux.md)
 
 ## Product Role
 
@@ -60,71 +50,96 @@ It is not responsible for:
 
 ## Core Operator Flows
 
-- first-run bootstrap check
-- create a session
-- open a ready session
-- inspect a failed or degraded session
-- restart a session
-- delete a session safely
+### First-Run Bootstrap Check
 
-These are behavior scenarios that tests should cover at the smallest useful layer.
+- start state: operator opens the index with no confirmed runtime availability yet
+- success state: index confirms backend reachability and can render the session list or an empty state
+- failure state: index presents a clear platform-not-ready message with the next supported recovery step
+
+### Create Session
+
+- start state: operator sees the create form from the main index view
+- success state: new session appears immediately in a transient status and converges toward `ready`
+- failure state: validation or substrate errors are shown inline with safe, actionable messaging
+
+### Open Ready Session
+
+- start state: session is `ready`
+- success state: operator opens the backend-resolved `openUrl`
+- failure state: if open bootstrap fails, the operator gets auth-specific or session-specific guidance without raw secret exposure
+
+### Inspect Failed Or Degraded Session
+
+- start state: session is `degraded` or `failed`
+- success state: operator can understand the likely problem scope and next supported action
+
+### Restart Session
+
+- start state: session is `ready`, `degraded`, or `failed`
+- success state: session enters a visible transient state and later settles into `ready` or `failed`
+
+### Delete Session
+
+- start state: operator chooses delete from the list view
+- success state: confirmation explains the cleanup consequence and the session leaves the list after delete completes
 
 ## Information Architecture
 
-The primary view should make it easy to scan, open, and recover sessions.
+The primary view must make it easy to scan, open, and recover sessions.
 
-Expected information per session:
+Per-session information must include:
 
 - session name
-- repo and branch
+- repo and ref
 - status badge
 - time created
-- last transition or activity
+- last transition time
 - open action
 - restart action
 - delete action
 - failure summary when relevant
 
-## Session States
+## UI States
 
-The UI should support at least these states:
+### Page-Level States
 
-- empty
-- loading
+- bootstrap-check in progress
+- empty list
+- loading list
 - ready list
 - partial degradation
-- action in progress
-- failed action
+- platform unavailable
 
-Per-session states should match the status model defined in [Session Index API](session-index-api.md).
+### Per-Session States
 
-Tests should assert operator-visible behavior for each state rather than implementation details of how that state is rendered internally.
+- matches the status model from [Session Index API](session-index-api.md)
+- transient states must disable or limit conflicting actions where necessary
+- `degraded` and `failed` states must show the next supported action or escalation path
 
-## Error and Recovery UX
+## Error And Recovery UX
 
 For common failures, the UI should present:
 
 - plain-language summary
-- likely scope of the problem
+- likely scope of the problem: session, auth, or substrate
 - recommended next action
 - escalation path if the simple action fails
 
-The index page should be the first recovery surface. `K9s` and deeper cluster inspection are escalation tools.
-
-Tests should verify that common failures produce operator-meaningful guidance and a clear next action.
+The index page is the first recovery surface. `K9s`, logs, and deeper cluster inspection are escalation tools, not the default first step.
 
 ## Async And Refresh Behavior
 
-- the UI should tolerate eventual consistency between requested actions and platform state
-- in-progress actions should have visible pending states
-- stale data should converge toward the documented state model rather than requiring manual page reloads for the happy path
-- tests should assert stable operator-visible outcomes rather than exact timing or polling cadence
+- the UI tolerates eventual consistency between requested actions and platform state
+- in-progress actions have visible pending states
+- stale data converges toward the documented state model without manual refresh for the happy path
+- tests assert stable operator-visible outcomes rather than exact polling cadence
 
-## Authentication and Open-Session UX
+## Authentication And Open-Session UX
 
 - auth requirements must be visible without turning the UI into a password store
-- the operator should be able to tell whether a failure is auth-related or session-related
-- future remote gateway support must not require redesigning the UI model
+- the frontend consumes backend-resolved open-session behavior and must not guess URLs or manage reusable credentials directly
+- a ready session open flow may rely on backend-managed HTTP-only cookie bootstrap or an equivalent non-secret transport
+- auth failure messaging must be distinguishable from session startup or substrate failure messaging
 
 ## Responsive Behavior
 
@@ -136,22 +151,28 @@ Requirements:
 - avoids hover-only interaction
 - uses touch-friendly action targets
 - keeps session status and next action readable at reduced width
+- tolerates long repo names, many sessions, and multiple degraded sessions without hiding the next supported action
 
-## Behavior Test Scenarios
-
-Canonical behavior scenarios include:
+## Canonical Behavior Scenarios
 
 - empty session list
 - loading session list
 - successful session creation
 - validation failure during session creation
 - ready session open flow
+- not-ready open flow
 - degraded or failed session with recovery guidance
 - auth failure distinguished from session failure
 - restart flow with visible in-progress and completion states
 - delete flow with confirmation and consequence messaging
-- stale or eventually consistent state converging to the correct operator-visible outcome
-- mobile or narrow-width usability
+- stale state converging to the correct operator-visible outcome
+- narrow-width usability
+
+## Test Traceability
+
+- operator-visible list and form states map to component or integration tests
+- open-session, restart, delete, and recovery flows map to integration or end-to-end tests as needed
+- auth-vs-session failure distinction maps to contract plus component or integration coverage
 
 ## Maintainability Guardrails
 
@@ -159,4 +180,3 @@ Canonical behavior scenarios include:
 - keep frontend state shallow and typed
 - do not duplicate `opencode web` features
 - prefer simplicity and operator clarity over feature richness in v1
-- avoid tests that couple to private component state, incidental DOM structure, or backend implementation artifacts

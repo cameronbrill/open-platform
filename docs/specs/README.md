@@ -27,12 +27,17 @@ Specs describe the current intended design and implementation requirements. Use 
 
 ## Reading Rules
 
-- Specs are living documents and may change as implementation learns more.
-- Prefer specs over plans for current requirements.
-- Read the relevant ADR when you need rationale or decision history.
+- specs are the primary source for current intended behavior and requirements
+- plans do not override specs
+- ADRs provide rationale, tradeoffs, and durable decision history
+- if an index summary disagrees with the target spec, the target spec wins and the index should be corrected
+
+## Start Here
+
+- use [Platform Specs](platform/README.md) for the active implementation requirements for this repo
 
 ## Spec Areas
 
 | Folder | Purpose |
 | --- | --- |
-| [Platform](platform/README.md) | platform architecture details, contracts, operator UX requirements, and testing strategy |
+| [Platform](platform/README.md) | platform architecture details, contracts, secrets, tooling, operator UX requirements, and testing strategy |

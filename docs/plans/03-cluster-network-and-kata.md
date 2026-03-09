@@ -5,7 +5,7 @@ doc_type: "plan"
 status: "draft"
 date: "2026-03-08"
 updated: "2026-03-09"
-summary: "Local cluster substrate, ingress behavior, localhost exposure, and Kata validation."
+summary: "Local cluster substrate verification, localhost-only forwarding, Calico enforcement, ingress-nginx behavior, and Kata validation."
 aliases:
   - "Plan 03"
   - "Cluster Network and Kata Plan"
@@ -16,7 +16,7 @@ tags:
   - "kata"
   - "localhost-only"
 source_of_truth: "execution-plan"
-scope: "local cluster substrate, policy enforcement, ingress behavior, and Kata validation"
+scope: "local cluster substrate, policy enforcement, localhost behavior, and Kata validation"
 depends_on:
   - "docs/plans/02-vm-bootstrap.md"
 blocks:
@@ -27,97 +27,74 @@ related_docs:
   - "docs/adr/0004-local-substrate-selection.md"
   - "docs/specs/platform/testing-strategy.md"
   - "docs/specs/platform/tech-spec.md"
-  - "docs/plans/04-session-runtime.md"
 ---
 
 # Cluster Network and Kata
 
 ## Purpose
 
-Bring up the cluster substrate and validate the security-critical assumptions around networking, localhost exposure, and Kata.
+Bring up the supported cluster substrate and validate the security-critical assumptions around networking, localhost-only forwarding, and Kata.
 
 ## In Scope
 
-- `minikube`
-- cluster namespaces and base resources
-- `NetworkPolicy` enforcement
-- ingress or local exposure behavior
-- runtime class
+- `minikube` on the selected `none`-driver path
+- namespaces and base resources
+- Calico policy enforcement
+- ingress-nginx behavior
+- localhost-only forwarding verification
 - Kata install and validation
-- cluster health checks
-
-## Out of Scope
-
-- full session app behavior
-- session index page
-- Better Stack export
+- cluster doctor checks
 
 ## Deliverables
 
 - `cluster/base/*`
+- `cluster/networking/*`
 - `cluster/kata/*`
 - `mise run cluster:up`
 - `mise run cluster:doctor`
-- named smoke suites:
-  - `netpol-smoke`
-  - `localhost-smoke`
-  - `kata-smoke`
-- substrate decision outputs captured in [ADRs](../adr/README.md)
+- named smoke suites: `netpol-smoke`, `localhost-smoke`, `kata-smoke`
+- operator runbooks for cluster bring-up and common substrate failures
 
 ## Tasks
 
 ### Cluster Bring-Up
 
-- start `minikube`
+- start `minikube` on the selected substrate
 - define namespaces
 - define quotas and limit ranges
-- capture selected driver, runtime, and addon assumptions
+- capture runtime, addon, and forwarding assumptions in repo docs
 
-### Networking Substrate
+### Networking And Forwarding
 
-- document the chosen networking or CNI path
+- install and configure Calico
 - apply default-deny policy
-- validate actual policy enforcement
-- validate localhost-only access behavior
-- ensure smoke checks assert observable platform behavior rather than only manifest presence
+- validate real policy enforcement
+- validate ingress-nginx behavior for the selected `*.localhost` routing model
+- validate localhost-only forwarding from the Windows host to the VM and cluster boundary
 
 ### Kata
 
 - install and configure Kata
-- define `RuntimeClass`
-- validate a test workload under Kata
-- define a go or no-go gate if Kata is not viable on the chosen substrate
-- prefer runtime behavior assertions over merely proving config was applied
+- define the `RuntimeClass`
+- validate a real test workload under Kata
+- stop and record the blocker if Kata is not viable on the supported matrix
 
 ### Cluster Diagnostics
 
-- define doctor checks for:
-  - cluster health
-  - policy enforcement
-  - localhost exposure assumptions
-  - Kata availability
-- Tilt may optionally accelerate repeated rebuild, apply, watch, and observe cycles, but does not replace `mise run cluster:smoke`
-
-Expected smoke ownership:
-
-- `netpol-smoke` proves deny-by-default and allowed-egress behavior
-- `localhost-smoke` proves browser surfaces remain local-only
-- `kata-smoke` proves the workload actually runs with the intended runtime behavior
+- define doctor checks for cluster health, policy enforcement, localhost-only forwarding, and Kata availability
+- keep smoke checks behavior-oriented rather than manifest-only
 
 ## Validation
 
 - cluster boots reproducibly
-- policy enforcement works in practice
-- localhost-only exposure works as documented
+- Calico enforcement works in practice
+- localhost-only forwarding works as documented
 - a test pod runs under `runtimeClassName: kata`
-- smoke suites assert behavior, not just resource existence
+- doctor and smoke checks assert behavior, not just resource existence
 
 ## Exit Criteria
 
-- the cluster substrate is usable
+- the cluster substrate is usable on the supported matrix
 - security-critical network assumptions are verified
-- Kata is proven viable on this machine or explicitly blocked by a recorded decision
-
-## Risks / Notes
-
-- if policy enforcement is weak or inconsistent in the chosen local stack, fix that before relying on network isolation anywhere else
+- Kata is proven viable on this machine or implementation is explicitly blocked behind a replacement decision
+- Plan 04 has a stable substrate and forwarding model to build on
