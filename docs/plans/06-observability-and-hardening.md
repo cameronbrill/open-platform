@@ -1,12 +1,33 @@
-# Observability and Hardening
+---
+title: "Observability and Hardening"
+doc_id: "PLAN-006"
+doc_type: "plan"
+status: "draft"
+date: "2026-03-08"
+updated: "2026-03-09"
+summary: "OTEL, Better Stack, telemetry redaction, RBAC hardening, and final v1 security validation."
+aliases:
+  - "Plan 06"
+  - "Observability and Hardening Plan"
+tags:
+  - "plan"
+  - "observability"
+  - "telemetry"
+  - "security"
+  - "hardening"
+source_of_truth: "execution-plan"
+scope: "OTEL, Better Stack, telemetry redaction, RBAC hardening, auth leakage prevention, and localhost-only verification"
+depends_on:
+  - "docs/plans/05-session-index-and-operator-ux.md"
+blocks:
+  - "v1 completion"
+related_docs:
+  - "docs/specs/platform/tech-spec.md"
+  - "docs/plans/04-session-runtime.md"
+  - "docs/plans/05-session-index-and-operator-ux.md"
+---
 
-- Status: Draft
-- Date: 2026-03-08
-- Scope: OTEL, Better Stack, telemetry redaction, RBAC hardening, auth leakage prevention, and localhost-only verification
-- Depends on:
-  - `docs/plans/05-session-index-and-operator-ux.md`
-- Blocks:
-  - v1 completion
+# Observability and Hardening
 
 ## Purpose
 

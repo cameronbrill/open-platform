@@ -1,7 +1,33 @@
-# Open Platform Technical Specification
+---
+title: "Open Platform Technical Specification"
+doc_id: "SPEC-PLATFORM-001"
+doc_type: "spec"
+status: "draft"
+date: "2026-03-08"
+updated: "2026-03-09"
+summary: "Current intended design and implementation requirements for the local single-user OpenCode platform."
+aliases:
+  - "Platform Tech Spec"
+tags:
+  - "spec"
+  - "platform"
+  - "opencode"
+  - "kubernetes"
+  - "kata"
+source_of_truth: "implementation-requirements"
+related_docs:
+  - "docs/adr/0001-platform-architecture.md"
+  - "docs/adr/0002-secret-bootstrap-and-1password-integration.md"
+  - "docs/adr/0003-runtime-secret-materialization.md"
+  - "docs/adr/0004-local-substrate-selection.md"
+  - "docs/adr/0005-session-exposure-and-routing.md"
+  - "docs/adr/0006-session-index-stack-and-api-boundary.md"
+  - "docs/specs/platform/session-index-api.md"
+  - "docs/specs/platform/session-index-ux.md"
+  - "docs/plans/initial-implementation-plan.md"
+---
 
-- Status: Draft
-- Date: 2026-03-08
+# Open Platform Technical Specification
 
 ## Overview
 
@@ -21,14 +47,20 @@ The session index follows a strict v1 boundary:
 
 ## Related Documents
 
-- `docs/adr/0001-platform-architecture.md`
-- `docs/adr/0002-secret-bootstrap-and-1password-integration.md`
-- `docs/adr/0003-runtime-secret-materialization.md`
-- `docs/adr/0004-local-substrate-selection.md`
-- `docs/adr/0005-session-exposure-and-routing.md`
-- `docs/adr/0006-session-index-stack-and-api-boundary.md`
-- `docs/specs/platform/session-index-api.md`
-- `docs/specs/platform/session-index-ux.md`
+- [ADR-0001: Local Autonomous Coding Platform Architecture](../../adr/0001-platform-architecture.md)
+- [ADR-0002: Secret Bootstrap and 1Password Integration](../../adr/0002-secret-bootstrap-and-1password-integration.md)
+- [ADR-0003: Runtime Secret Materialization](../../adr/0003-runtime-secret-materialization.md)
+- [ADR-0004: Local Substrate Selection](../../adr/0004-local-substrate-selection.md)
+- [ADR-0005: Session Exposure and Routing](../../adr/0005-session-exposure-and-routing.md)
+- [ADR-0006: Session Index Stack and API Boundary](../../adr/0006-session-index-stack-and-api-boundary.md)
+- [Session Index API](session-index-api.md)
+- [Session Index UX](session-index-ux.md)
+
+## Source Of Truth
+
+- Use ADRs for durable decisions and rationale.
+- Use this spec and the linked sub-specs for current intended implementation requirements.
+- Use plans for sequencing, milestones, and exit criteria.
 
 ## Goals
 
@@ -71,13 +103,26 @@ Implications:
 ```text
 open-platform/
   README.md
+  AGENTS.md
   mise.toml
+  opencode.json
   flake.nix
   flake.lock
+
+  .agents/
+    agents/
+      docs-reader.md
+    skills/
+      docs-grounding/
+        SKILL.md
+
+  .opencode/
+    agents -> ../.agents/agents
 
   docs/
     README.md
     adr/
+      README.md
       0001-platform-architecture.md
       0002-secret-bootstrap-and-1password-integration.md
       0003-runtime-secret-materialization.md
@@ -85,11 +130,14 @@ open-platform/
       0005-session-exposure-and-routing.md
       0006-session-index-stack-and-api-boundary.md
     specs/
+      README.md
       platform/
+        README.md
         tech-spec.md
         session-index-api.md
         session-index-ux.md
     plans/
+      README.md
 
   .config/
     hk/
@@ -238,15 +286,16 @@ Owns:
 
 ### `mise`
 
-`mise` is the primary human entrypoint for tool management, tasks, builds, and validation.
+`mise` is the primary human entrypoint for tool management, tasks, builds, validation, and docs discovery automation.
 
 Responsibilities:
 
-- install and pin required CLI tools
+- install and pin required CLI tools, including docs discovery and file-watching tools
 - define repeatable local tasks
 - provide a standard shell or task environment
 - integrate with `fnox` for secrets-aware task execution
 - expose the public command surface for operators and contributors
+- automate repo-local docs indexing and refresh workflows
 
 Expected task groups:
 
@@ -255,7 +304,21 @@ Expected task groups:
 - `session:*`
 - `obs:*`
 - `dev:*`
+- `docs:*`
 - top-level quality gates such as `fmt`, `lint`, `typecheck`, `build`, `validate`, and `check`
+
+### `OpenCode`
+
+Project agent behavior is committed to the repo.
+
+Requirements:
+
+- keep `AGENTS.md` minimal and delegate detailed docs-routing rules to [docs/README.md](../../README.md)
+- commit `opencode.json` to the repo for project-level OpenCode config
+- store custom agents in `.agents/agents/`
+- store reusable skills in `.agents/skills/`
+- use `.opencode/agents` only as a compatibility symlink to `.agents/agents`
+- prefer skills over project commands for reusable repo guidance
 
 ### `fnox`
 
@@ -537,7 +600,7 @@ The index backend, not the frontend, should own URL resolution for operator-visi
 
 ## Session Resource Shape
 
-Canonical operator-facing fields are defined in `docs/specs/platform/session-index-api.md` and should include at least:
+Canonical operator-facing fields are defined in [Session Index API](session-index-api.md) and should include at least:
 
 - `id`
 - `name`
@@ -553,7 +616,7 @@ Canonical operator-facing fields are defined in `docs/specs/platform/session-ind
 
 ## API Contract
 
-The detailed API contract lives in `docs/specs/platform/session-index-api.md`.
+The detailed API contract lives in [Session Index API](session-index-api.md).
 
 The initial contract should support:
 
@@ -582,7 +645,7 @@ These statuses should be mapped by backend logic rather than directly exposing r
 
 ## Session Index Page
 
-The detailed UX contract lives in `docs/specs/platform/session-index-ux.md`.
+The detailed UX contract lives in [Session Index UX](session-index-ux.md).
 
 At a minimum, the session index must define:
 
@@ -730,13 +793,13 @@ Recovery flows must be documented and must not require ad hoc manual debugging a
 
 Execution details live in:
 
-- `docs/plans/00-operator-prerequisites.md`
-- `docs/plans/01-repo-foundations.md`
-- `docs/plans/02-vm-bootstrap.md`
-- `docs/plans/03-cluster-network-and-kata.md`
-- `docs/plans/04-session-runtime.md`
-- `docs/plans/05-session-index-and-operator-ux.md`
-- `docs/plans/06-observability-and-hardening.md`
+- [Operator Prerequisites](../../plans/00-operator-prerequisites.md)
+- [Repo Foundations](../../plans/01-repo-foundations.md)
+- [VM Bootstrap](../../plans/02-vm-bootstrap.md)
+- [Cluster Network and Kata](../../plans/03-cluster-network-and-kata.md)
+- [Session Runtime](../../plans/04-session-runtime.md)
+- [Session Index and Operator UX](../../plans/05-session-index-and-operator-ux.md)
+- [Observability and Hardening](../../plans/06-observability-and-hardening.md)
 
 ## Risks and Open Questions
 

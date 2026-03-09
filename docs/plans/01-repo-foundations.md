@@ -1,16 +1,38 @@
-# Repo Foundations
+---
+title: "Repo Foundations"
+doc_id: "PLAN-001"
+doc_type: "plan"
+status: "draft"
+date: "2026-03-08"
+updated: "2026-03-09"
+summary: "Repository skeleton, task surface, agent config, hook policy, and docs discovery conventions for the platform."
+aliases:
+  - "Plan 01"
+  - "Repo Foundations Plan"
+tags:
+  - "plan"
+  - "repo"
+  - "mise"
+  - "hk"
+  - "docs"
+source_of_truth: "execution-plan"
+scope: "repository structure, task surface, hook policy, quality gates, and operator-facing conventions"
+depends_on:
+  - "docs/plans/00-operator-prerequisites.md"
+blocks:
+  - "docs/plans/02-vm-bootstrap.md"
+  - "docs/plans/03-cluster-network-and-kata.md"
+  - "docs/plans/04-session-runtime.md"
+  - "docs/plans/05-session-index-and-operator-ux.md"
+  - "docs/plans/06-observability-and-hardening.md"
+related_docs:
+  - "docs/README.md"
+  - "docs/specs/platform/tech-spec.md"
+  - "docs/specs/platform/session-index-api.md"
+  - "docs/specs/platform/session-index-ux.md"
+---
 
-- Status: Draft
-- Date: 2026-03-08
-- Scope: repository structure, task surface, hook policy, quality gates, and operator-facing conventions
-- Depends on:
-  - `docs/plans/00-operator-prerequisites.md`
-- Blocks:
-  - `docs/plans/02-vm-bootstrap.md`
-  - `docs/plans/03-cluster-network-and-kata.md`
-  - `docs/plans/04-session-runtime.md`
-  - `docs/plans/05-session-index-and-operator-ux.md`
-  - `docs/plans/06-observability-and-hardening.md`
+# Repo Foundations
 
 ## Purpose
 
@@ -24,6 +46,7 @@ Establish the repo as the single source of truth for configuration, tasks, hooks
 - docs and directory structure matching the tech spec
 - quality-gate command surface
 - `fnox` integration conventions at the repo level
+- repo-managed OpenCode agent config and docs discovery automation
 
 ## Out of Scope
 
@@ -34,6 +57,11 @@ Establish the repo as the single source of truth for configuration, tasks, hooks
 ## Deliverables
 
 - `mise.toml`
+- `AGENTS.md`
+- `opencode.json`
+- `.agents/agents/`
+- `.agents/skills/`
+- `.opencode/agents -> ../.agents/agents`
 - `.config/hk/`
 - initial directory skeleton under:
   - `nixos/`
@@ -54,6 +82,9 @@ Establish the repo as the single source of truth for configuration, tasks, hooks
 ### Public `mise` Task Surface
 
 - define stable public tasks for:
+  - `docs:qmd:init`
+  - `docs:qmd:refresh`
+  - `docs:qmd:watch`
   - `fmt`
   - `fmt:check`
   - `lint`
@@ -92,9 +123,17 @@ Establish the repo as the single source of truth for configuration, tasks, hooks
 
 ### Documentation and Contracts
 
-- update root docs so a new operator knows the supported entrypoints
+- update [the docs index](../README.md) so a new operator knows the supported entrypoints
 - make sure plans, specs, and ADRs cross-reference cleanly
-- reserve `docs/specs/platform/session-index-api.md` and `docs/specs/platform/session-index-ux.md` as the contract sources for the session index
+- reserve [Session Index API](../specs/platform/session-index-api.md) and [Session Index UX](../specs/platform/session-index-ux.md) as the contract sources for the session index
+
+### OpenCode and Docs Discovery
+
+- keep `AGENTS.md` minimal and point detailed docs-routing behavior to [the docs index](../README.md)
+- commit `opencode.json`, `.agents/agents/`, and `.agents/skills/` to the repo
+- use `.opencode/agents` only as a compatibility symlink to `.agents/agents`
+- manage `qmd` and file-watching through `mise`
+- automate docs discovery refresh during docs work
 
 ### Local Inner Loop and Fixtures
 
@@ -107,6 +146,9 @@ Establish the repo as the single source of truth for configuration, tasks, hooks
 - `mise tasks` exposes a coherent operator surface
 - quality-gate task names are documented
 - hooks can run locally through `mise`
+- OpenCode project config and skills are repo-managed
+- QMD refresh works through repo-managed `mise` tasks
+- docs discovery can refresh automatically during docs work
 - repo layout matches the tech spec
 - API and UX spec locations are clearly documented
 
@@ -114,6 +156,7 @@ Establish the repo as the single source of truth for configuration, tasks, hooks
 
 - repo has a clean implementation skeleton
 - task, formatting, linting, and hook ownership are clear
+- docs discovery and agent config are reproducible across checkouts
 - no ambiguity remains about `mise` vs scripts vs `nix` ownership
 
 ## Risks / Notes

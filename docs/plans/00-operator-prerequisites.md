@@ -1,17 +1,36 @@
-# Operator Prerequisites
+---
+title: "Operator Prerequisites"
+doc_id: "PLAN-000"
+doc_type: "plan"
+status: "draft"
+date: "2026-03-08"
+updated: "2026-03-09"
+summary: "Manual setup, accounts, and operator-owned decisions required before implementation begins."
+aliases:
+  - "Plan 00"
+  - "Operator Prerequisites Plan"
+tags:
+  - "plan"
+  - "prerequisites"
+  - "operator"
+  - "setup"
+source_of_truth: "execution-plan"
+scope: "manual and operator-owned setup required before implementation"
+depends_on: []
+blocks:
+  - "docs/plans/01-repo-foundations.md"
+  - "docs/plans/02-vm-bootstrap.md"
+  - "docs/plans/03-cluster-network-and-kata.md"
+  - "docs/plans/04-session-runtime.md"
+  - "docs/plans/05-session-index-and-operator-ux.md"
+  - "docs/plans/06-observability-and-hardening.md"
+related_docs:
+  - "docs/adr/README.md"
+  - "docs/specs/platform/tech-spec.md"
+  - "docs/plans/initial-implementation-plan.md"
+---
 
-- Status: Draft
-- Date: 2026-03-08
-- Scope: manual and operator-owned setup required before implementation
-- Depends on:
-  - none
-- Blocks:
-  - `docs/plans/01-repo-foundations.md`
-  - `docs/plans/02-vm-bootstrap.md`
-  - `docs/plans/03-cluster-network-and-kata.md`
-  - `docs/plans/04-session-runtime.md`
-  - `docs/plans/05-session-index-and-operator-ux.md`
-  - `docs/plans/06-observability-and-hardening.md`
+# Operator Prerequisites
 
 ## Purpose
 
@@ -40,7 +59,7 @@ List all manual work that must be completed by the operator before implementatio
 - secret materialization approach
 - final localhost exposure mechanics
 
-These must be captured in ADRs when they become durable architecture choices.
+These must be captured in [ADRs](../adr/README.md) when they become durable architecture choices.
 
 ## Manual Host Prerequisites
 

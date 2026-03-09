@@ -1,7 +1,30 @@
-# ADR-0002: Secret Bootstrap and 1Password Integration
+---
+title: "ADR-0002: Secret Bootstrap and 1Password Integration"
+doc_id: "ADR-0002"
+doc_type: "adr"
+status: "accepted"
+date: "2026-03-08"
+updated: "2026-03-09"
+summary: "Use 1Password as the v1 secret backend behind fnox and operator-invoked mise workflows."
+aliases:
+  - "Secret Bootstrap"
+  - "1Password Integration"
+tags:
+  - "adr"
+  - "secrets"
+  - "1password"
+  - "fnox"
+  - "bootstrap"
+source_of_truth: "durable-decision"
+related_docs:
+  - "docs/adr/0003-runtime-secret-materialization.md"
+  - "docs/specs/platform/tech-spec.md"
+  - "docs/plans/00-operator-prerequisites.md"
+supersedes: []
+superseded_by: []
+---
 
-- Status: Accepted
-- Date: 2026-03-08
+# ADR-0002: Secret Bootstrap and 1Password Integration
 
 ## Context
 
@@ -56,4 +79,4 @@ The bootstrap model is operator-mediated:
 ## Follow-Up
 
 - revisit the backend choice if future remote access or automation requires machine identities
-- define runtime materialization separately in `ADR-0003`
+- define runtime materialization separately in [ADR-0003](0003-runtime-secret-materialization.md)

@@ -1,11 +1,39 @@
-# Session Index API
+---
+title: "Session Index API"
+doc_id: "SPEC-PLATFORM-API-001"
+doc_type: "spec"
+status: "draft"
+date: "2026-03-08"
+updated: "2026-03-09"
+summary: "Typed frontend and backend API contract for the session index."
+aliases:
+  - "Session API"
+  - "Session Index Contract"
+tags:
+  - "spec"
+  - "api"
+  - "session-index"
+  - "contract"
+source_of_truth: "implementation-requirements"
+related_docs:
+  - "docs/specs/platform/tech-spec.md"
+  - "docs/specs/platform/session-index-ux.md"
+  - "docs/adr/0006-session-index-stack-and-api-boundary.md"
+  - "docs/plans/05-session-index-and-operator-ux.md"
+---
 
-- Status: Draft
-- Date: 2026-03-08
+# Session Index API
 
 ## Purpose
 
 Define the typed frontend/backend contract for the session index before UI implementation couples too tightly to backend internals.
+
+## Related Documents
+
+- [Open Platform Technical Specification](tech-spec.md)
+- [Session Index UX](session-index-ux.md)
+- [ADR-0006: Session Index Stack and API Boundary](../../adr/0006-session-index-stack-and-api-boundary.md)
+- [Session Index and Operator UX Plan](../../plans/05-session-index-and-operator-ux.md)
 
 ## Scope
 

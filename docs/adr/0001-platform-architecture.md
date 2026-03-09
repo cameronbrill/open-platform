@@ -1,7 +1,29 @@
-# ADR-0001: Local Autonomous Coding Platform Architecture
+---
+title: "ADR-0001: Local Autonomous Coding Platform Architecture"
+doc_id: "ADR-0001"
+doc_type: "adr"
+status: "proposed"
+date: "2026-03-08"
+updated: "2026-03-09"
+summary: "Adopt the Windows host plus NixOS VM, minikube, Kata, per-session opencode web endpoints, and Better Stack architecture for the single-user localhost-only v1 platform."
+aliases:
+  - "Platform Architecture"
+  - "Local Autonomous Coding Platform Architecture"
+tags:
+  - "adr"
+  - "architecture"
+  - "platform"
+  - "security"
+  - "opencode"
+source_of_truth: "durable-decision"
+related_docs:
+  - "docs/specs/platform/tech-spec.md"
+  - "docs/plans/initial-implementation-plan.md"
+supersedes: []
+superseded_by: []
+---
 
-- Status: Proposed
-- Date: 2026-03-08
+# ADR-0001: Local Autonomous Coding Platform Architecture
 
 ## Context
 
