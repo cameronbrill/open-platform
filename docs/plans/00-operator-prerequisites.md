@@ -109,12 +109,14 @@ These must be captured in [ADRs](../adr/README.md) when they become durable arch
 ### Operator Tooling Prerequisites
 
 - confirm local Git access strategy
+- install and configure `Graphite`
 - confirm browser used for local access
 - confirm Zed usage mode if relevant later
 - confirm understanding of Windows host vs VM vs cluster locality
 - confirm understanding that `mise` is the supported validation and testing path
 - confirm that Tilt is optional and not a prerequisite
 - confirm understanding that Buildkite runs repo-owned tasks rather than defining a separate public workflow surface
+- confirm understanding that `Graphite` is the supported interface for all normal git operations
 
 ## Completion Checklist
 
@@ -126,6 +128,8 @@ These must be captured in [ADRs](../adr/README.md) when they become durable arch
 - [ ] local Infisical CLI access works
 - [ ] local `fnox`-mediated secret workflows work
 - [ ] Buildkite prerequisites are available for CI setup
+- [ ] Graphite is installed and usable
+- [ ] operator understands Graphite-based stacked workflow expectations
 - [ ] operator understands host vs VM vs cluster access model
 - [ ] blocking architecture decisions are captured in ADRs or explicitly deferred
 

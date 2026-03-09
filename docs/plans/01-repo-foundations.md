@@ -96,6 +96,7 @@ Establish the repo as the single source of truth for configuration, tasks, hooks
   - `telemetry/betterstack/`
 - documented repo task conventions
 - documented secret-management and repository-tooling spec locations
+- documented Graphite workflow conventions
 - documented API and UX spec locations
 - documented testing strategy location and test task conventions
 
@@ -193,6 +194,13 @@ Establish the repo as the single source of truth for configuration, tasks, hooks
 - document how `fnox` maps local secret names and profiles to the Infisical backend
 - keep `fnox` as a local UX layer beneath `mise`, not a replacement public interface
 
+### Graphite And Branch Workflow Conventions
+
+- document Graphite as the required interface for normal git work
+- document stacked-branch expectations
+- document pragmatically small pull request expectations
+- document clean-`main` policy
+
 ### Buildkite CI Surface
 
 - add the initial Buildkite pipeline skeleton
@@ -240,6 +248,7 @@ Establish the repo as the single source of truth for configuration, tasks, hooks
 - staged secret scanning can run through repo-managed hooks and tasks
 - declarative local secret UX config exists in the repo
 - Buildkite and Renovate configuration exist in the repo
+- Graphite workflow conventions are documented
 - API and UX spec locations are clearly documented
 - layered test and validation task names are documented through `mise`
 
@@ -251,6 +260,7 @@ Establish the repo as the single source of truth for configuration, tasks, hooks
 - fast and slow validation loops are documented and distinguished
 - package management, orchestration, secret scanning, CI, and dependency automation foundations are documented and scaffolded
 - local secret UX and active secret backend roles are documented and scaffolded
+- Graphite workflow ownership is documented clearly
 - no ambiguity remains about `mise` vs scripts vs `nix` ownership
 
 ## Risks / Notes

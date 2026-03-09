@@ -87,6 +87,29 @@ The repo should converge on a small, explicit environment model such as:
 - document path naming rules
 - document session/runtime secret naming expectations
 
+## Initial Secret Inventory
+
+### Required Now
+
+- `OPENCODE_SERVER_PASSWORD`
+- `MODEL_PROVIDER`
+- `MODEL_API_KEY`
+- `BETTER_STACK_SOURCE_TOKEN`
+- `BETTER_STACK_INGESTING_HOST`
+
+### Required When CI Is Enabled
+
+- `INFISICAL_CI_CLIENT_ID`
+- `INFISICAL_CI_CLIENT_SECRET`
+- `BUILDKITE_AGENT_TOKEN` or the chosen Buildkite bootstrap credential
+
+### Optional Or Provider-Specific
+
+- `ANTHROPIC_API_KEY`
+- `OPENAI_API_KEY`
+
+Use either the generic provider model or provider-specific naming, but do not mix both patterns casually.
+
 ## Local Operator Auth
 
 - operators bootstrap local secret access for `fnox` using `Infisical`
