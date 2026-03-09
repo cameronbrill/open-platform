@@ -19,6 +19,7 @@ related_docs:
   - "docs/README.md"
   - "docs/specs/platform/README.md"
   - "docs/plans/README.md"
+  - "docs/specs/platform/testing-strategy.md"
 ---
 
 # Architecture Decision Records
@@ -41,6 +42,7 @@ ADRs capture durable platform choices and rationale. Use them to answer why a de
 | [ADR-0004: Local Substrate Selection](0004-local-substrate-selection.md) | proposed | hypervisor, networking, and local cluster substrate selection |
 | [ADR-0005: Session Exposure and Routing](0005-session-exposure-and-routing.md) | proposed | session URL resolution, exposure, and routing contract |
 | [ADR-0006: Session Index Stack and API Boundary](0006-session-index-stack-and-api-boundary.md) | accepted | thin session index stack, contract-first boundary, and UI constraints |
+| [ADR-0007: Testing Strategy and Inner Feedback Loops](0007-testing-strategy-and-inner-feedback-loops.md) | accepted | behavior-focused TDD, layered test loops, and optional Tilt scope |
 
 ## Related Docs
 

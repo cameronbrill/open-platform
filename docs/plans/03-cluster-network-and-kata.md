@@ -25,6 +25,7 @@ blocks:
   - "docs/plans/06-observability-and-hardening.md"
 related_docs:
   - "docs/adr/0004-local-substrate-selection.md"
+  - "docs/specs/platform/testing-strategy.md"
   - "docs/specs/platform/tech-spec.md"
   - "docs/plans/04-session-runtime.md"
 ---
@@ -78,6 +79,7 @@ Bring up the cluster substrate and validate the security-critical assumptions ar
 - apply default-deny policy
 - validate actual policy enforcement
 - validate localhost-only access behavior
+- ensure smoke checks assert observable platform behavior rather than only manifest presence
 
 ### Kata
 
@@ -85,6 +87,7 @@ Bring up the cluster substrate and validate the security-critical assumptions ar
 - define `RuntimeClass`
 - validate a test workload under Kata
 - define a go or no-go gate if Kata is not viable on the chosen substrate
+- prefer runtime behavior assertions over merely proving config was applied
 
 ### Cluster Diagnostics
 
@@ -93,6 +96,13 @@ Bring up the cluster substrate and validate the security-critical assumptions ar
   - policy enforcement
   - localhost exposure assumptions
   - Kata availability
+- Tilt may optionally accelerate repeated rebuild, apply, watch, and observe cycles, but does not replace `mise run cluster:smoke`
+
+Expected smoke ownership:
+
+- `netpol-smoke` proves deny-by-default and allowed-egress behavior
+- `localhost-smoke` proves browser surfaces remain local-only
+- `kata-smoke` proves the workload actually runs with the intended runtime behavior
 
 ## Validation
 
@@ -100,6 +110,7 @@ Bring up the cluster substrate and validate the security-critical assumptions ar
 - policy enforcement works in practice
 - localhost-only exposure works as documented
 - a test pod runs under `runtimeClassName: kata`
+- smoke suites assert behavior, not just resource existence
 
 ## Exit Criteria
 

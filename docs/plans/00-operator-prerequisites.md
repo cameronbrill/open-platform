@@ -26,6 +26,7 @@ blocks:
   - "docs/plans/06-observability-and-hardening.md"
 related_docs:
   - "docs/adr/README.md"
+  - "docs/specs/platform/testing-strategy.md"
   - "docs/specs/platform/tech-spec.md"
   - "docs/plans/initial-implementation-plan.md"
 ---
@@ -98,6 +99,8 @@ These must be captured in [ADRs](../adr/README.md) when they become durable arch
 - confirm browser used for local access
 - confirm Zed usage mode if relevant later
 - confirm understanding of Windows host vs VM vs cluster locality
+- confirm understanding that `mise` is the supported validation and testing path
+- confirm that Tilt is optional and not a prerequisite
 
 ## Completion Checklist
 

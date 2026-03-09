@@ -17,11 +17,13 @@ tags:
 source_of_truth: "implementation-requirements"
 related_docs:
   - "docs/adr/0001-platform-architecture.md"
+  - "docs/adr/0007-testing-strategy-and-inner-feedback-loops.md"
   - "docs/adr/0002-secret-bootstrap-and-1password-integration.md"
   - "docs/adr/0003-runtime-secret-materialization.md"
   - "docs/adr/0004-local-substrate-selection.md"
   - "docs/adr/0005-session-exposure-and-routing.md"
   - "docs/adr/0006-session-index-stack-and-api-boundary.md"
+  - "docs/specs/platform/testing-strategy.md"
   - "docs/specs/platform/session-index-api.md"
   - "docs/specs/platform/session-index-ux.md"
   - "docs/plans/initial-implementation-plan.md"
@@ -53,6 +55,8 @@ The session index follows a strict v1 boundary:
 - [ADR-0004: Local Substrate Selection](../../adr/0004-local-substrate-selection.md)
 - [ADR-0005: Session Exposure and Routing](../../adr/0005-session-exposure-and-routing.md)
 - [ADR-0006: Session Index Stack and API Boundary](../../adr/0006-session-index-stack-and-api-boundary.md)
+- [ADR-0007: Testing Strategy and Inner Feedback Loops](../../adr/0007-testing-strategy-and-inner-feedback-loops.md)
+- [Testing Strategy](testing-strategy.md)
 - [Session Index API](session-index-api.md)
 - [Session Index UX](session-index-ux.md)
 
@@ -75,6 +79,8 @@ The session index follows a strict v1 boundary:
 - prefer strict typing everywhere practical
 - document the frontend/backend API contract before UI implementation
 - keep the operator UI responsive and mobile-tolerant even before remote access exists
+- use behavior-focused TDD for repo-owned code and contracts
+- maintain layered feedback loops so fast tests do not require the full platform stack
 
 ## Non-Goals
 
@@ -85,6 +91,7 @@ The session index follows a strict v1 boundary:
 - public Internet exposure in v1
 - SSR in v1
 - `React Router` in v1
+- requiring Tilt for bootstrap or normal operator workflows
 
 ## Single-User Operating Model
 
@@ -339,6 +346,14 @@ Requirements:
 
 Hooks should route through `mise` tasks rather than invoking raw tools directly.
 
+### `Tilt`
+
+Tilt is optional contributor tooling.
+
+Use it only to accelerate the slower integration, end-to-end, and platform verification loops when repeated rebuild, apply, watch, and observe cycles become the bottleneck.
+
+Tilt must not replace `mise` as the public entrypoint and must not become a bootstrap requirement.
+
 ### Scripts
 
 Files under `scripts/` are implementation details and should be invoked through `mise` rather than treated as the primary public interface.
@@ -397,10 +412,27 @@ Documented public quality-gate tasks should include:
 - `mise run build`
 - `mise run build:ts`
 - `mise run build:go`
+- `mise run test`
+- `mise run test:go`
+- `mise run test:ts`
+- `mise run test:contract`
+- `mise run test:integration`
+- `mise run test:e2e`
+- `mise run cluster:smoke`
+- `mise run security:smoke`
+- `mise run obs:smoke`
 - `mise run validate`
 - `mise run check`
 
-Detailed testing and TDD policy is intentionally deferred to a follow-up pass.
+Detailed testing policy lives in [Testing Strategy](testing-strategy.md), including execution gates, required-vs-optional command maturity, fixture discipline, and security regression minimums.
+
+### Layered Test Loops
+
+The platform uses three testing and feedback-loop tiers:
+
+- fast local loop for unit, component, and contract tests
+- default `mise` integration loop for cross-process and service-boundary behavior
+- optional Tilt-assisted slow loop for repeated integration, end-to-end, and platform verification cycles
 
 ## Build Command Surface
 
@@ -410,22 +442,27 @@ Detailed testing and TDD policy is intentionally deferred to a follow-up pass.
 
 ## Local Inner Loop
 
-The platform should support two inner loops:
+The platform should support three inner loops:
 
-- a fast local loop for documentation, frontend, and task-surface work
-- a full platform loop for VM, cluster, networking, Kata, and session validation
+- a fast local loop for documentation, frontend, backend, and contract work
+- a normal `mise` integration loop for runtime and app-boundary behavior
+- an optional Tilt-assisted slow loop for repeated VM, cluster, networking, Kata, and session validation
 
-The fast loop should avoid requiring a full cluster bring-up when not necessary.
+The fast loop should avoid requiring a full cluster bring-up when not necessary. Tilt remains optional and should only accelerate the slowest loops.
 
 ## Fixture Strategy
 
 The repo should define canonical fixtures for:
 
 - sample session repos
+- API payload examples and error cases
+- session status transitions
 - network policy smoke validation
 - Kata validation
 - telemetry redaction validation
 - safe fake secrets and auth placeholders for local validation
+
+Fixtures should model behaviors and contracts, not only internal implementation shapes.
 
 ## VM Specification
 
@@ -597,6 +634,7 @@ The index backend, not the frontend, should own URL resolution for operator-visi
 - the session index remains an orchestration surface, not a second session client
 - orchestration logic stays on the backend
 - the API contract must exist before UI implementation couples to backend internals
+- tests should verify the behavior at this boundary through contracts and operator-visible outcomes
 
 ## Session Resource Shape
 
@@ -618,6 +656,8 @@ Canonical operator-facing fields are defined in [Session Index API](session-inde
 
 The detailed API contract lives in [Session Index API](session-index-api.md).
 
+This API contract is also the source of truth for contract tests at the session index boundary.
+
 The initial contract should support:
 
 - session listing
@@ -629,6 +669,8 @@ The initial contract should support:
 ## Session Status Semantics
 
 The operator-visible state model should be stable and typed.
+
+These statuses are behavior-level assertions for tests, not merely documentation labels.
 
 Expected statuses include:
 
@@ -762,6 +804,8 @@ Evaluation criteria include:
 
 Richer frontend architecture can be reconsidered later if the operator UI outgrows this boundary.
 
+Tilt, if adopted, is optional and only supports the slower integration and platform loops around this stack.
+
 ## Golden Path
 
 The expected happy path for the single operator is:
@@ -806,7 +850,8 @@ Execution details live in:
 - nested virtualization requirements for the chosen Kata path may need tuning
 - the exact substrate matrix still needs to be finalized in follow-on ADRs
 - final routing choice depends on `opencode web` validation
-- detailed testing and TDD policy is intentionally deferred to a later pass
+- duplicate workflows may emerge if Tilt and `mise` drift apart
+- tests may become brittle if they assert implementation details rather than behaviors and contracts
 
 ## Acceptance Criteria
 
@@ -816,6 +861,10 @@ Execution details live in:
 - secret values are not stored in `nix`, committed manifests, or repo-managed `.env` files
 - `hk` hooks run locally
 - the public formatting, linting, typechecking, build, and validation surface is documented
+- the repo-wide testing strategy is documented in [Testing Strategy](testing-strategy.md)
+- fast local behavior tests do not require full cluster bring-up whenever possible
+- slower platform verification exists separately for localhost-only exposure, network policy, auth handling, and telemetry redaction
+- Tilt, if present, remains optional and layered under `mise`
 - a Kata-backed OpenCode session is reachable in browser
 - session pods run with `runtimeClassName: kata`
 - session pods do not receive unnecessary Kubernetes API credentials by default
