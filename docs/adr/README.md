@@ -37,12 +37,15 @@ ADRs capture durable platform choices and rationale. Use them to answer why a de
 | Doc | Status | Focus |
 | --- | --- | --- |
 | [ADR-0001: Local Autonomous Coding Platform Architecture](0001-platform-architecture.md) | proposed | top-level v1 architecture, threat model, and tool ownership |
-| [ADR-0002: Secret Bootstrap and 1Password Integration](0002-secret-bootstrap-and-1password-integration.md) | accepted | secret backend, operator bootstrap, and guardrails |
+| [ADR-0002: Secret Bootstrap and Local Secret UX](0002-secret-bootstrap-and-local-secret-ux.md) | accepted | operator bootstrap and declarative local secret UX guardrails |
 | [ADR-0003: Runtime Secret Materialization](0003-runtime-secret-materialization.md) | accepted | runtime secret injection and lifecycle policy |
 | [ADR-0004: Local Substrate Selection](0004-local-substrate-selection.md) | proposed | hypervisor, networking, and local cluster substrate selection |
 | [ADR-0005: Session Exposure and Routing](0005-session-exposure-and-routing.md) | proposed | session URL resolution, exposure, and routing contract |
 | [ADR-0006: Session Index Stack and API Boundary](0006-session-index-stack-and-api-boundary.md) | accepted | thin session index stack, contract-first boundary, and UI constraints |
 | [ADR-0007: Testing Strategy and Inner Feedback Loops](0007-testing-strategy-and-inner-feedback-loops.md) | accepted | behavior-focused TDD, layered test loops, and optional Tilt scope |
+| [ADR-0008: Infisical Secret Management and CI Auth](0008-infisical-secret-management-and-ci-auth.md) | accepted | active secret manager, CI auth, and secret scanning direction |
+| [ADR-0009: Monorepo Toolchain with pnpm, Nx, and nx-go](0009-monorepo-toolchain-pnpm-nx-and-nx-go.md) | accepted | package management, orchestration, caching, and Go workspace model |
+| [ADR-0010: Repository Automation with Buildkite and RenovateBot](0010-repository-automation-buildkite-and-renovate.md) | accepted | CI system and dependency update automation |
 
 ## Related Docs
 

@@ -16,7 +16,7 @@ tags:
   - "kubernetes"
 source_of_truth: "durable-decision"
 related_docs:
-  - "docs/adr/0002-secret-bootstrap-and-1password-integration.md"
+  - "docs/adr/0002-secret-bootstrap-and-local-secret-ux.md"
   - "docs/specs/platform/tech-spec.md"
   - "docs/plans/04-session-runtime.md"
 supersedes: []

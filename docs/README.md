@@ -48,12 +48,15 @@ Open Platform treats repository docs as the primary source of truth for architec
 | --- | --- | --- |
 | [ADR Index](adr/README.md) | active | navigate durable decisions |
 | [ADR-0001: Local Autonomous Coding Platform Architecture](adr/0001-platform-architecture.md) | proposed | top-level platform architecture and v1 constraints |
-| [ADR-0002: Secret Bootstrap and 1Password Integration](adr/0002-secret-bootstrap-and-1password-integration.md) | accepted | secret backend and operator-mediated bootstrap |
+| [ADR-0002: Secret Bootstrap and Local Secret UX](adr/0002-secret-bootstrap-and-local-secret-ux.md) | accepted | operator-mediated bootstrap and declarative local secret UX |
 | [ADR-0003: Runtime Secret Materialization](adr/0003-runtime-secret-materialization.md) | accepted | runtime secret injection and lifecycle rules |
 | [ADR-0004: Local Substrate Selection](adr/0004-local-substrate-selection.md) | proposed | hypervisor, networking, and local cluster substrate choices |
 | [ADR-0005: Session Exposure and Routing](adr/0005-session-exposure-and-routing.md) | proposed | session URL resolution and localhost-only routing direction |
 | [ADR-0006: Session Index Stack and API Boundary](adr/0006-session-index-stack-and-api-boundary.md) | accepted | Go and TypeScript split, thin UI boundary, and API-first rule |
 | [ADR-0007: Testing Strategy and Inner Feedback Loops](adr/0007-testing-strategy-and-inner-feedback-loops.md) | accepted | behavior-focused TDD, layered test loops, and optional Tilt scope |
+| [ADR-0008: Infisical Secret Management and CI Auth](adr/0008-infisical-secret-management-and-ci-auth.md) | accepted | active secret manager, CI auth, and secret scanning direction |
+| [ADR-0009: Monorepo Toolchain with pnpm, Nx, and nx-go](adr/0009-monorepo-toolchain-pnpm-nx-and-nx-go.md) | accepted | package management, task orchestration, caching, and Go workspace model |
+| [ADR-0010: Repository Automation with Buildkite and RenovateBot](adr/0010-repository-automation-buildkite-and-renovate.md) | accepted | CI system and dependency update automation |
 
 ## Specs
 
@@ -62,6 +65,8 @@ Open Platform treats repository docs as the primary source of truth for architec
 | [Specs Index](specs/README.md) | active | navigate active specs |
 | [Platform Specs Index](specs/platform/README.md) | active | navigate platform spec docs |
 | [Open Platform Technical Specification](specs/platform/tech-spec.md) | draft | current intended platform design and implementation requirements |
+| [Secret Management](specs/platform/secret-management.md) | draft | current local, CI, runtime, and scanning secret model |
+| [Repository Tooling](specs/platform/repository-tooling.md) | draft | current package manager, orchestration, CI, and dependency automation model |
 | [Testing Strategy](specs/platform/testing-strategy.md) | draft | behavior-focused TDD policy, layered test loops, and feedback-loop guidance |
 | [Session Index API](specs/platform/session-index-api.md) | draft | typed frontend and backend API contract |
 | [Session Index UX](specs/platform/session-index-ux.md) | draft | operator UX model and responsive behavior |
@@ -82,7 +87,12 @@ Open Platform treats repository docs as the primary source of truth for architec
 
 ## Current Defaults
 
-- `fnox` retrieves secret values from `1Password` per [ADR-0002](adr/0002-secret-bootstrap-and-1password-integration.md).
+- `Infisical` is the active secret backend and CI secret system per [ADR-0008](adr/0008-infisical-secret-management-and-ci-auth.md).
+- `fnox` provides the declarative repo-managed local secret UX backed by `Infisical`.
+- `Infisical` secret scanning is used in pre-commit workflows.
+- `pnpm` is the Node package manager per [ADR-0009](adr/0009-monorepo-toolchain-pnpm-nx-and-nx-go.md).
+- `Nx` is the task orchestration and caching layer, with `@nx-go/nx-go` for Go integration.
+- `Buildkite` is CI and `RenovateBot` manages dependency updates per [ADR-0010](adr/0010-repository-automation-buildkite-and-renovate.md).
 - Backend code prefers `Go` and frontend code prefers `TypeScript` per [ADR-0006](adr/0006-session-index-stack-and-api-boundary.md).
 - v1 requires an explicit frontend and backend API contract before UI implementation.
 - v1 avoids SSR and avoids `React Router`.
