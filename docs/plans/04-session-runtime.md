@@ -24,6 +24,9 @@ blocks:
   - "docs/plans/06-observability-and-hardening.md"
 related_docs:
   - "docs/adr/0003-runtime-secret-materialization.md"
+  - "docs/adr/0008-infisical-secret-management-and-ci-auth.md"
+  - "docs/specs/platform/secret-management.md"
+  - "docs/specs/platform/repository-tooling.md"
   - "docs/adr/0005-session-exposure-and-routing.md"
   - "docs/specs/platform/testing-strategy.md"
   - "docs/specs/platform/tech-spec.md"
@@ -70,11 +73,12 @@ Implement the first end-to-end session runtime.
 - support the secret and environment contract
 - ensure auth is enabled
 - document local image build and load behavior
+- keep any Go-backed runtime components aligned with the Nx and multi-module Go workspace conventions
 
 ### Session Secrets and Auth
 
 - generate per-session auth material where practical
-- document how runtime secrets enter the pod
+- document how task-mediated Infisical retrieval provides runtime secrets to the pod
 - ensure secret values do not land in committed artifacts or persistent debug output
 
 ### Session Pod Security
