@@ -70,6 +70,7 @@ Outcome:
 - manual host, account, and secret prerequisites are complete
 - Infisical backend access works for the operator and CI prerequisites are available
 - local declarative `fnox` secret workflows are ready for repo use
+- Graphite is installed and configured for the supported git workflow
 - blocking choices are captured in ADRs or explicitly deferred
 
 ### Milestone 1: Repo and Workflow Foundations
@@ -81,6 +82,7 @@ Outcome:
 - `pnpm`, `Nx`, and `@nx-go/nx-go` repo conventions are established
 - project-level OpenCode config, agents, and skills are committed to the repo
 - `hk`, Infisical secret scanning, declarative `fnox` secret UX, Buildkite, and Renovate foundations are in place
+- Graphite workflow is documented as the standard contribution model
 - QMD discovery is repo-managed and refreshable through `mise`
 - docs refresh automation exists for active docs work
 - formatting, linting, typechecking, build, and validation task surfaces are documented
@@ -150,6 +152,8 @@ Outcome:
 - the API boundary between backend and frontend is documented before UI implementation
 - build, lint, typecheck, format, and validation commands are documented through `mise`
 - package management, orchestration, CI, dependency automation, and secret scanning are documented through living specs
+- Graphite-based stacked workflow is documented and expected
+- `main` is treated as the clean integration baseline
 - fast local behavior tests exist for repo-owned code and contracts
 - slower platform verification exists for environment-sensitive behaviors
 - Tilt remains optional and is not required for v1 completion

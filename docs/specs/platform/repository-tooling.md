@@ -18,6 +18,7 @@ tags:
   - "renovate"
 source_of_truth: "implementation-requirements"
 related_docs:
+  - "docs/adr/0011-graphite-stacked-branch-workflow.md"
   - "docs/specs/platform/secret-management.md"
   - "docs/adr/0009-monorepo-toolchain-pnpm-nx-and-nx-go.md"
   - "docs/adr/0010-repository-automation-buildkite-and-renovate.md"
@@ -68,6 +69,12 @@ Define the current active tooling architecture for the repo.
 - maps repo-declared secret names and profiles to the active backend
 - integrates with `mise` rather than replacing it
 
+### `Graphite`
+
+- required interface for all normal git operations
+- owns stacked branch creation, restacking, syncing, and submission flow
+- keeps normal contributor workflow off raw `git`
+
 ### `pnpm`
 
 - Node package manager
@@ -102,6 +109,15 @@ Define the current active tooling architecture for the repo.
 
 - active secret backend and secret scanning integration
 - active secret-management model is covered more fully in [Secret Management](secret-management.md)
+
+## Git And Review Workflow Policy
+
+- use `Graphite` for all normal branching, stacking, syncing, and submission
+- keep pull requests pragmatically small
+- each pull request should be independently understandable
+- each pull request should be independently testable where practical
+- review and land stacks from the bottom up
+- `main` stays clean and is not the place for in-flight feature work
 
 ## Package Management Policy
 
@@ -220,6 +236,7 @@ The canonical staged scan should be routed through `mise` rather than a bespoke 
 - use repo-declared `fnox` flows for local secret-aware execution
 - use `pnpm` for Node dependency management
 - use `Nx` for internal project/task orchestration
+- use `Graphite` for all normal git operations
 - follow the multi-module Go conventions when adding Go code
 - treat Buildkite as the CI runner for repo-owned tasks, not as a separate manual workflow surface
 
@@ -228,7 +245,9 @@ The canonical staged scan should be routed through `mise` rather than a bespoke 
 - package manager policy is explicit
 - task/orchestration model is explicit
 - declarative local secret UX ownership is explicit
+- Graphite-based git workflow is explicit
 - Go workspace and scaffolding model is explicit
 - CI model is explicit
 - dependency automation policy is explicit
 - secret scanning role is explicit
+- clean-`main` and small-PR expectations are explicit
