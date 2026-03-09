@@ -1,14 +1,35 @@
-# Cluster Network and Kata
+---
+title: "Cluster Network and Kata"
+doc_id: "PLAN-003"
+doc_type: "plan"
+status: "draft"
+date: "2026-03-08"
+updated: "2026-03-09"
+summary: "Local cluster substrate, ingress behavior, localhost exposure, and Kata validation."
+aliases:
+  - "Plan 03"
+  - "Cluster Network and Kata Plan"
+tags:
+  - "plan"
+  - "cluster"
+  - "networking"
+  - "kata"
+  - "localhost-only"
+source_of_truth: "execution-plan"
+scope: "local cluster substrate, policy enforcement, ingress behavior, and Kata validation"
+depends_on:
+  - "docs/plans/02-vm-bootstrap.md"
+blocks:
+  - "docs/plans/04-session-runtime.md"
+  - "docs/plans/05-session-index-and-operator-ux.md"
+  - "docs/plans/06-observability-and-hardening.md"
+related_docs:
+  - "docs/adr/0004-local-substrate-selection.md"
+  - "docs/specs/platform/tech-spec.md"
+  - "docs/plans/04-session-runtime.md"
+---
 
-- Status: Draft
-- Date: 2026-03-08
-- Scope: local cluster substrate, policy enforcement, ingress behavior, and Kata validation
-- Depends on:
-  - `docs/plans/02-vm-bootstrap.md`
-- Blocks:
-  - `docs/plans/04-session-runtime.md`
-  - `docs/plans/05-session-index-and-operator-ux.md`
-  - `docs/plans/06-observability-and-hardening.md`
+# Cluster Network and Kata
 
 ## Purpose
 
@@ -40,7 +61,7 @@ Bring up the cluster substrate and validate the security-critical assumptions ar
   - `netpol-smoke`
   - `localhost-smoke`
   - `kata-smoke`
-- substrate decision outputs captured in ADRs
+- substrate decision outputs captured in [ADRs](../adr/README.md)
 
 ## Tasks
 

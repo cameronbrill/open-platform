@@ -1,7 +1,29 @@
-# ADR-0003: Runtime Secret Materialization
+---
+title: "ADR-0003: Runtime Secret Materialization"
+doc_id: "ADR-0003"
+doc_type: "adr"
+status: "accepted"
+date: "2026-03-08"
+updated: "2026-03-09"
+summary: "Define how secrets are fetched through fnox and materialized at runtime as late as possible."
+aliases:
+  - "Runtime Secret Materialization"
+tags:
+  - "adr"
+  - "secrets"
+  - "runtime"
+  - "fnox"
+  - "kubernetes"
+source_of_truth: "durable-decision"
+related_docs:
+  - "docs/adr/0002-secret-bootstrap-and-1password-integration.md"
+  - "docs/specs/platform/tech-spec.md"
+  - "docs/plans/04-session-runtime.md"
+supersedes: []
+superseded_by: []
+---
 
-- Status: Accepted
-- Date: 2026-03-08
+# ADR-0003: Runtime Secret Materialization
 
 ## Context
 

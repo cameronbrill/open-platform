@@ -1,7 +1,29 @@
-# ADR-0005: Session Exposure and Routing
+---
+title: "ADR-0005: Session Exposure and Routing"
+doc_id: "ADR-0005"
+doc_type: "adr"
+status: "proposed"
+date: "2026-03-08"
+updated: "2026-03-09"
+summary: "Define how session URLs are resolved and exposed while keeping v1 localhost-only and future remote access compatible."
+aliases:
+  - "Session Exposure and Routing"
+tags:
+  - "adr"
+  - "routing"
+  - "localhost-only"
+  - "session-index"
+  - "opencode"
+source_of_truth: "durable-decision"
+related_docs:
+  - "docs/specs/platform/tech-spec.md"
+  - "docs/specs/platform/session-index-api.md"
+  - "docs/plans/04-session-runtime.md"
+supersedes: []
+superseded_by: []
+---
 
-- Status: Proposed
-- Date: 2026-03-08
+# ADR-0005: Session Exposure and Routing
 
 ## Context
 

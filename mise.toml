@@ -1,0 +1,88 @@
+[tools]
+node = "22"
+"npm:@tobilu/qmd" = "1.1.5"
+watchexec = "2.5.0"
+
+[env]
+QMD_INDEX = "open-platform"
+QMD_COLLECTION = "docs"
+
+[tasks."docs:qmd:ensure"]
+description = "Ensure the repo QMD collection exists"
+run = '''
+set -eu
+if ! qmd --index "$QMD_INDEX" collection list | grep -q "^$QMD_COLLECTION "; then
+  qmd --index "$QMD_INDEX" collection add ./docs --name "$QMD_COLLECTION"
+  qmd --index "$QMD_INDEX" context add "qmd://$QMD_COLLECTION" "Canonical Open Platform repository docs. Start with docs/README.md for navigation and source-of-truth rules."
+  qmd --index "$QMD_INDEX" context add "qmd://$QMD_COLLECTION/adr" "Durable architecture decisions and rationale. Use for why and durable choices."
+  qmd --index "$QMD_INDEX" context add "qmd://$QMD_COLLECTION/specs" "Current intended design and implementation requirements. Use for what should be true now."
+  qmd --index "$QMD_INDEX" context add "qmd://$QMD_COLLECTION/plans" "Execution plans, milestones, blockers, and mutable work. Use for sequencing and next steps."
+fi
+'''
+
+[tasks."docs:qmd:init"]
+description = "Sync the repo QMD collection and contexts"
+run = '''
+set -eu
+mise run docs:qmd:ensure
+qmd --index "$QMD_INDEX" context rm "qmd://$QMD_COLLECTION/plans" >/dev/null 2>&1 || true
+qmd --index "$QMD_INDEX" context rm "qmd://$QMD_COLLECTION/specs" >/dev/null 2>&1 || true
+qmd --index "$QMD_INDEX" context rm "qmd://$QMD_COLLECTION/adr" >/dev/null 2>&1 || true
+qmd --index "$QMD_INDEX" context rm "qmd://$QMD_COLLECTION" >/dev/null 2>&1 || true
+qmd --index "$QMD_INDEX" context add "qmd://$QMD_COLLECTION" "Canonical Open Platform repository docs. Start with docs/README.md for navigation and source-of-truth rules."
+qmd --index "$QMD_INDEX" context add "qmd://$QMD_COLLECTION/adr" "Durable architecture decisions and rationale. Use for why and durable choices."
+qmd --index "$QMD_INDEX" context add "qmd://$QMD_COLLECTION/specs" "Current intended design and implementation requirements. Use for what should be true now."
+qmd --index "$QMD_INDEX" context add "qmd://$QMD_COLLECTION/plans" "Execution plans, milestones, blockers, and mutable work. Use for sequencing and next steps."
+'''
+
+[tasks."docs:qmd:update"]
+description = "Update the repo QMD index"
+run = '''
+set -eu
+mise run docs:qmd:ensure
+qmd --index "$QMD_INDEX" update
+'''
+
+[tasks."docs:qmd:embed"]
+description = "Generate semantic embeddings for repo docs"
+run = '''
+set -eu
+mise run docs:qmd:ensure
+qmd --index "$QMD_INDEX" embed
+'''
+
+[tasks."docs:qmd:refresh"]
+description = "Refresh the repo QMD index and embeddings"
+sources = ["docs/**/*.md", "mise.toml"]
+run = '''
+set -eu
+mise run docs:qmd:update
+qmd --index "$QMD_INDEX" embed
+'''
+
+[tasks."docs:qmd:watch"]
+description = "Watch docs and refresh QMD automatically"
+run = '''
+set -eu
+mise run docs:qmd:init
+mise watch docs:qmd:refresh --on-busy-update queue --debounce 2s
+'''
+
+[tasks."docs:qmd:status"]
+description = "Show repo QMD index status"
+run = '''
+set -eu
+mise run docs:qmd:ensure
+qmd --index "$QMD_INDEX" status
+'''
+
+[tasks."docs:qmd:smoke"]
+description = "Run smoke searches against the repo QMD index"
+run = '''
+set -eu
+mise run docs:qmd:update
+qmd --index "$QMD_INDEX" search "runtime secret materialization" -c "$QMD_COLLECTION" -n 3 >/dev/null
+qmd --index "$QMD_INDEX" search "session index api contract" -c "$QMD_COLLECTION" -n 3 >/dev/null
+qmd --index "$QMD_INDEX" search "localhost-only exposure" -c "$QMD_COLLECTION" -n 3 >/dev/null
+echo "QMD smoke queries completed"
+'''

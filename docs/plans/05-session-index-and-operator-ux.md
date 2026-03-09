@@ -1,12 +1,34 @@
-# Session Index and Operator UX
+---
+title: "Session Index and Operator UX"
+doc_id: "PLAN-005"
+doc_type: "plan"
+status: "draft"
+date: "2026-03-08"
+updated: "2026-03-09"
+summary: "Thin operator-facing session console, API contract, and recovery UX for the platform."
+aliases:
+  - "Plan 05"
+  - "Session Index and Operator UX Plan"
+tags:
+  - "plan"
+  - "session-index"
+  - "ux"
+  - "api"
+  - "operator-console"
+source_of_truth: "execution-plan"
+scope: "thin operator-facing session management UI, explicit API contract, and recovery commands"
+depends_on:
+  - "docs/plans/04-session-runtime.md"
+blocks:
+  - "docs/plans/06-observability-and-hardening.md"
+related_docs:
+  - "docs/adr/0006-session-index-stack-and-api-boundary.md"
+  - "docs/specs/platform/session-index-api.md"
+  - "docs/specs/platform/session-index-ux.md"
+  - "docs/specs/platform/tech-spec.md"
+---
 
-- Status: Draft
-- Date: 2026-03-08
-- Scope: thin operator-facing session management UI, explicit API contract, and recovery commands
-- Depends on:
-  - `docs/plans/04-session-runtime.md`
-- Blocks:
-  - `docs/plans/06-observability-and-hardening.md`
+# Session Index and Operator UX
 
 ## Purpose
 
@@ -31,8 +53,8 @@ Provide the single-user operator with the supported UX for normal platform use.
 ## Deliverables
 
 - `apps/session-index/`
-- `docs/specs/platform/session-index-api.md`
-- `docs/specs/platform/session-index-ux.md`
+- [Session Index API](../specs/platform/session-index-api.md)
+- [Session Index UX](../specs/platform/session-index-ux.md)
 - session lifecycle `mise` commands
 - `mise run session:create`
 - `mise run session:list`
