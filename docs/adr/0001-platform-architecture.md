@@ -41,7 +41,7 @@ Constraints and preferences:
 - Observability should be easy to operate.
 - Environment management should use `mise`.
 - Git hooks should use `hk`.
-- Secrets should use `fnox` integrated with `1Password`.
+- Secrets should use `fnox` backed by `Infisical`.
 - Non-secret configuration should live in `mise` and `nix`; secret values must not.
 - Frontend code should prefer `TypeScript` over JavaScript.
 - Backend code should prefer `Go` unless a later ADR justifies another language.
@@ -66,7 +66,7 @@ Adopt the following architecture:
 - `Better Stack` for observability.
 - `mise` for task and environment management.
 - `hk` for pre-commit hooks.
-- `fnox` for secret retrieval, backed by `1Password`.
+- `fnox` for declarative local secret UX, backed by `Infisical`.
 - behavior-focused TDD for repo-owned code and contracts.
 - `mise` as the public entrypoint for validation and testing workflows.
 
@@ -147,11 +147,11 @@ Rejected for the primary architecture because:
 - simple, explicit git hook management
 - good fit for repo-managed development workflows
 
-### Why `fnox` + `1Password`
+### Why `fnox` + `Infisical`
 
-- strong fit for a single-user local operator workflow
+- strong fit for a low-cognitive-load, declarative local operator workflow
+- keeps `Infisical` as the backend source of truth for local use and CI
 - keeps secret values out of the repo and out of `nix`
-- keeps the backend abstract if a future move to another secret system becomes necessary
 
 ### Why `Go` + `TypeScript` with an explicit API boundary
 
@@ -185,15 +185,15 @@ Kata-based isolation is treated as one containment layer, not a complete securit
 
 The v1 bootstrap model is operator-mediated.
 
-- `1Password` is the source of truth for secret values.
-- `fnox` is the repo-facing secret retrieval frontend.
+- `Infisical` is the source of truth for secret values.
+- `fnox` is the repo-facing declarative secret UX layer for local workflows.
 - `mise` is the only supported public path for secret-aware task execution.
 - secret values must not be stored in `nix`, `.env` files, shell profiles, or committed manifests.
-- v1 does not rely on long-lived service-account tokens or exported 1Password session tokens stored in repo-managed VM artifacts.
+- v1 does not rely on long-lived exported secret material stored in repo-managed VM artifacts.
 
 ## Runtime Secret Materialization Policy
 
-- secrets are fetched through `fnox` during task execution
+- secrets are fetched through `fnox` during local task execution, backed by `Infisical`
 - secrets are materialized as late as possible
 - per-session secrets should be unique when possible, especially for session auth
 - persistent Kubernetes `Secret` objects are allowed only when needed and should remain narrowly scoped
@@ -303,7 +303,7 @@ Tool responsibilities are intentionally separated:
 
 - `nix` owns system configuration, system packages, and long-lived machine or service definitions
 - `mise` owns developer-facing tasks, build and validation entrypoints, and repo-level orchestration
-- `fnox` owns secret retrieval and secret injection into tasks and runtime configuration
+- `fnox` owns the declarative local secret UX and task integration
 - `hk` owns local hook execution policy
 - `dprint` is the public formatting entrypoint and orchestrates underlying formatters
 
@@ -390,7 +390,7 @@ Recovery flows must be documented and must not require ad hoc manual debugging a
 ## Implementation Notes
 
 - keep all non-secret environment configuration in `mise` and `nix`
-- keep secret retrieval behind `fnox` and `1Password`
+- keep secret retrieval behind `fnox` and `Infisical`
 - do not commit `.env` files
 - prefer `git clone per session` initially
 - use `runtimeClassName: kata` for session pods

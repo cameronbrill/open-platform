@@ -22,6 +22,8 @@ depends_on:
 blocks:
   - "v1 completion"
 related_docs:
+  - "docs/specs/platform/secret-management.md"
+  - "docs/specs/platform/repository-tooling.md"
   - "docs/specs/platform/testing-strategy.md"
   - "docs/specs/platform/tech-spec.md"
   - "docs/plans/04-session-runtime.md"
@@ -76,6 +78,7 @@ Finish v1 by adding observability and validating the security posture.
 - confirm secrets and raw session content are not exported by default
 - confirm auth or password data does not leak through URLs, logs, or telemetry
 - document what is and is not sent
+- treat Infisical scanning as complementary to, not a replacement for, runtime leak prevention
 
 ### Hardening
 
@@ -90,6 +93,7 @@ Finish v1 by adding observability and validating the security posture.
 - define which checks belong to integration tests, platform smoke tests, and security regressions
 - keep these slower verification layers separate from the fast local loop
 - Tilt may optionally assist repeated slow verification, but must not replace `mise` workflows
+- Buildkite should run or schedule the documented slower security and observability suites
 
 Minimum required security regressions should include:
 
@@ -113,6 +117,7 @@ Minimum required security regressions should include:
 - localhost-only behavior is confirmed
 - final acceptance criteria can be demonstrated
 - slower platform verification suites confirm the expected security and observability behaviors
+- dependency-update PRs are expected to pass the same relevant CI and security gates
 
 ## Exit Criteria
 

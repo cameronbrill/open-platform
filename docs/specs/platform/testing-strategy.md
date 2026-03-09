@@ -161,12 +161,14 @@ Keep this fast and local.
 - linting
 - typechecking where practical
 - the cheapest relevant unit, component, or contract checks
+- staged secret scanning through `Infisical`
 
 ### Pre-Merge Gate
 
 - all required fast local checks
 - change-appropriate integration tests
 - contract drift detection for API and UX-visible changes
+- Buildkite runs the documented required fast and boundary-crossing gates through repo-owned tasks
 
 ### Slow Manual Or CI Gate
 
@@ -174,6 +176,7 @@ Keep this fast and local.
 - platform smoke suites
 - security regressions
 - observability regressions
+- Buildkite should run or schedule these slower suites where they are part of the documented milestone or release gates
 
 ## Command Surface Maturity
 
@@ -189,6 +192,7 @@ Keep this fast and local.
 - `mise run build`
 - `mise run build:ts`
 - `mise run build:go`
+- `mise run secrets:scan`
 - `mise run test`
 - `mise run test:go`
 - `mise run test:ts`
@@ -218,6 +222,7 @@ Use the command maturity table above as the canonical list of required, later, a
 
 At minimum, the platform must have regression coverage for:
 
+- committed-secret detection in staged changes
 - unauthorized or malformed attempts to open sessions
 - secret leakage through logs, URLs, telemetry, and errors
 - localhost-only exposure from outside the expected local boundary
@@ -279,9 +284,11 @@ Fixtures should model behavior and contracts, not just internal implementation s
 ## Not Required Yet
 
 - mandatory Tilt usage for normal development
+- treating Infisical secret scanning as a substitute for runtime leak-prevention tests
 - full end-to-end coverage for every change
 - broad snapshot-heavy UI testing
 - broad platform-smoke execution for small local-only refactors that do not cross relevant boundaries
+- treating Buildkite as a separate public workflow surface instead of a runner for repo-owned tasks
 
 ## Acceptance Mapping
 
