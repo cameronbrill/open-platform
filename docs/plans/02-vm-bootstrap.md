@@ -24,6 +24,8 @@ blocks:
   - "docs/plans/05-session-index-and-operator-ux.md"
   - "docs/plans/06-observability-and-hardening.md"
 related_docs:
+  - "docs/specs/platform/secret-management.md"
+  - "docs/specs/platform/repository-tooling.md"
   - "docs/specs/platform/testing-strategy.md"
   - "docs/specs/platform/tech-spec.md"
   - "docs/plans/03-cluster-network-and-kata.md"
@@ -80,13 +82,17 @@ Create the NixOS VM control plane and make it reproducible from repo configurati
 ### Toolchains
 
 - ensure `git`, `kubectl`, `helm`, `k9s`, and `mise` are available
+- ensure Corepack and `pnpm` are available where the operator workflow depends on Node tooling
+- ensure `Nx` can run in the supported operator path
+- ensure `fnox` is available if local secret-aware workflows run from the VM path
 - ensure the Go toolchain is available for backend builds
 - ensure the TypeScript build path is available where needed for frontend builds
 - Tilt may be installed later as optional contributor tooling, but it is not part of bootstrap success
 
 ### Secrets Access Path
 
-- document how the operator uses `fnox` and `1Password` while running tasks that execute in the VM path
+- document how the operator uses `Infisical` while running tasks that execute in the VM path
+- document how repo-declared `fnox` flows are used in local secret-aware VM workflows
 - ensure bootstrap does not leave exported secret material on disk
 
 ### Rebuild and Recovery

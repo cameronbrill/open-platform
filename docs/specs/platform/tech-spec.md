@@ -23,6 +23,11 @@ related_docs:
   - "docs/adr/0004-local-substrate-selection.md"
   - "docs/adr/0005-session-exposure-and-routing.md"
   - "docs/adr/0006-session-index-stack-and-api-boundary.md"
+  - "docs/adr/0008-infisical-secret-management-and-ci-auth.md"
+  - "docs/adr/0009-monorepo-toolchain-pnpm-nx-and-nx-go.md"
+  - "docs/adr/0010-repository-automation-buildkite-and-renovate.md"
+  - "docs/specs/platform/secret-management.md"
+  - "docs/specs/platform/repository-tooling.md"
   - "docs/specs/platform/testing-strategy.md"
   - "docs/specs/platform/session-index-api.md"
   - "docs/specs/platform/session-index-ux.md"
@@ -56,6 +61,11 @@ The session index follows a strict v1 boundary:
 - [ADR-0005: Session Exposure and Routing](../../adr/0005-session-exposure-and-routing.md)
 - [ADR-0006: Session Index Stack and API Boundary](../../adr/0006-session-index-stack-and-api-boundary.md)
 - [ADR-0007: Testing Strategy and Inner Feedback Loops](../../adr/0007-testing-strategy-and-inner-feedback-loops.md)
+- [ADR-0008: Infisical Secret Management and CI Auth](../../adr/0008-infisical-secret-management-and-ci-auth.md)
+- [ADR-0009: Monorepo Toolchain with pnpm, Nx, and nx-go](../../adr/0009-monorepo-toolchain-pnpm-nx-and-nx-go.md)
+- [ADR-0010: Repository Automation with Buildkite and RenovateBot](../../adr/0010-repository-automation-buildkite-and-renovate.md)
+- [Secret Management](secret-management.md)
+- [Repository Tooling](repository-tooling.md)
 - [Testing Strategy](testing-strategy.md)
 - [Session Index API](session-index-api.md)
 - [Session Index UX](session-index-ux.md)
@@ -64,6 +74,8 @@ The session index follows a strict v1 boundary:
 
 - Use ADRs for durable decisions and rationale.
 - Use this spec and the linked sub-specs for current intended implementation requirements.
+- Use [Secret Management](secret-management.md) for the active local, CI, runtime, and scanning secret model.
+- Use [Repository Tooling](repository-tooling.md) for the active package manager, orchestration, CI, and dependency automation model.
 - Use plans for sequencing, milestones, and exit criteria.
 
 ## Goals
@@ -74,7 +86,9 @@ The session index follows a strict v1 boundary:
 - support browser-based access to sessions, localhost-only by default in v1
 - make cluster state and session health observable
 - centralize tasks and environment handling through `mise`
-- centralize secrets through `fnox` backed by `1Password`
+- centralize active secrets through `Infisical`
+- provide declarative repo-managed local secret UX through `fnox`
+- standardize Node package management through `pnpm` and internal orchestration/caching through `Nx`
 - standardize local validation and guardrails with `hk`
 - prefer strict typing everywhere practical
 - document the frontend/backend API contract before UI implementation
@@ -112,9 +126,20 @@ open-platform/
   README.md
   AGENTS.md
   mise.toml
+  nx.json
+  pnpm-workspace.yaml
+  .npmrc
+  pnpm-lock.yaml
   opencode.json
+  renovate.json
   flake.nix
   flake.lock
+
+  .buildkite/
+    pipeline.yml
+
+  .infisical-scan.toml
+  .infisicalignore
 
   .agents/
     agents/
@@ -136,11 +161,18 @@ open-platform/
       0004-local-substrate-selection.md
       0005-session-exposure-and-routing.md
       0006-session-index-stack-and-api-boundary.md
+      0007-testing-strategy-and-inner-feedback-loops.md
+      0008-infisical-secret-management-and-ci-auth.md
+      0009-monorepo-toolchain-pnpm-nx-and-nx-go.md
+      0010-repository-automation-buildkite-and-renovate.md
     specs/
       README.md
       platform/
         README.md
         tech-spec.md
+        secret-management.md
+        repository-tooling.md
+        testing-strategy.md
         session-index-api.md
         session-index-ux.md
     plans/
@@ -222,6 +254,9 @@ open-platform/
 - `NixOS VM`
   - `mise`
   - `fnox`
+  - `pnpm`
+  - `Nx`
+  - `Infisical`
   - `hk`
   - `kubectl`
   - `helm`
@@ -300,7 +335,7 @@ Responsibilities:
 - install and pin required CLI tools, including docs discovery and file-watching tools
 - define repeatable local tasks
 - provide a standard shell or task environment
-- integrate with `fnox` for secrets-aware task execution
+- invoke secrets-aware, package, and orchestration tooling through a stable repo-owned interface
 - expose the public command surface for operators and contributors
 - automate repo-local docs indexing and refresh workflows
 
@@ -311,8 +346,49 @@ Expected task groups:
 - `session:*`
 - `obs:*`
 - `dev:*`
+- `secrets:*`
 - `docs:*`
 - top-level quality gates such as `fmt`, `lint`, `typecheck`, `build`, `validate`, and `check`
+
+### `pnpm`
+
+`pnpm` is the required Node package manager.
+
+Requirements:
+
+- pin the package manager through Corepack
+- treat `pnpm-lock.yaml` as the canonical Node lockfile
+- use workspace-aware dependency management for repo-owned TypeScript packages
+
+### `Nx`
+
+`Nx` is the orchestration and caching layer for repo tasks.
+
+Requirements:
+
+- use `Nx` for project graph and target orchestration
+- keep `mise` as the public interface above `Nx`
+- declare cacheable vs non-cacheable targets intentionally
+
+### `@nx-go/nx-go`
+
+`@nx-go/nx-go` is the Go integration plugin for `Nx`.
+
+Requirements:
+
+- use a multi-module Go workspace by default
+- keep project layout conventional enough for plugin inference to work reliably
+- document plugin version compatibility and caveats in living tooling docs
+
+### `fnox`
+
+`fnox` is the declarative repo-level secret UX layer for local workflows.
+
+Requirements:
+
+- declare required secret names and local secret-aware execution behavior in repo-managed config
+- map local workflows to the active `Infisical` backend without storing secret values in the repo
+- integrate with `mise` rather than becoming a second public interface
 
 ### `OpenCode`
 
@@ -327,18 +403,16 @@ Requirements:
 - use `.opencode/agents` only as a compatibility symlink to `.agents/agents`
 - prefer skills over project commands for reusable repo guidance
 
-### `fnox`
+### `Infisical`
 
-`fnox` is the secret retrieval frontend.
-
-In v1 it is backed by `1Password` and should follow an operator-mediated workflow.
+`Infisical` is the active secret backend.
 
 Requirements:
 
-- secrets are not committed to the repo
-- secret values are not stored in `nix`
-- secrets are retrieved during task execution rather than embedded in static artifacts
-- banned patterns include long-lived exported secret files, committed manifests with secret values, and repo-managed `.env` files
+- use `Infisical` for local operator secret access
+- use `Infisical` for CI secret access
+- use `Infisical` secret scanning in pre-commit workflows
+- do not treat scanning as a substitute for runtime leak prevention or redaction
 
 ### `hk`
 
@@ -354,6 +428,26 @@ Use it only to accelerate the slower integration, end-to-end, and platform verif
 
 Tilt must not replace `mise` as the public entrypoint and must not become a bootstrap requirement.
 
+### `Buildkite`
+
+`Buildkite` is the CI system.
+
+Requirements:
+
+- CI invokes repo-owned `mise` tasks
+- CI may rely on `Nx` internally for affected execution and orchestration
+- CI must not become a parallel public workflow surface
+
+### `RenovateBot`
+
+`RenovateBot` manages dependency update automation.
+
+Requirements:
+
+- keep update scope and grouping intentional
+- keep review requirements explicit for higher-risk updates
+- ensure update PRs still pass normal repo gates
+
 ### Scripts
 
 Files under `scripts/` are implementation details and should be invoked through `mise` rather than treated as the primary public interface.
@@ -362,8 +456,9 @@ Files under `scripts/` are implementation details and should be invoked through 
 
 ### Backend
 
-- `1Password` is the v1 secret backend
-- `fnox` is the repo-facing retrieval layer
+- `Infisical` is the active secret backend and source of truth
+- `fnox` is the local declarative interface layered over the backend for local secret-aware execution
+- secret scanning also uses `Infisical`, but scanning and secret storage remain separate concerns
 
 ### Materialization Rules
 
@@ -372,6 +467,8 @@ Files under `scripts/` are implementation details and should be invoked through 
 - narrowly scoped Kubernetes `Secret` objects are allowed when necessary but are not the default for every workflow
 - per-session auth secrets should be unique when practical
 - secret values must not appear in logs, telemetry, URLs, or debug output
+- runtime materialization remains task-mediated rather than relying on a Kubernetes-side secret operator by default
+- CI may authenticate directly to `Infisical` even if local operator workflows are mediated by `fnox`
 
 ## Strict Typing Policy
 
@@ -412,6 +509,7 @@ Documented public quality-gate tasks should include:
 - `mise run build`
 - `mise run build:ts`
 - `mise run build:go`
+- `mise run secrets:scan`
 - `mise run test`
 - `mise run test:go`
 - `mise run test:ts`
@@ -426,6 +524,8 @@ Documented public quality-gate tasks should include:
 
 Detailed testing policy lives in [Testing Strategy](testing-strategy.md), including execution gates, required-vs-optional command maturity, fixture discipline, and security regression minimums.
 
+Buildkite is expected to execute the documented required repo gates through `mise`, while `Nx` may orchestrate the underlying project graph and caching behavior.
+
 ### Layered Test Loops
 
 The platform uses three testing and feedback-loop tiers:
@@ -439,6 +539,8 @@ The platform uses three testing and feedback-loop tiers:
 - frontend builds must be available through `mise run build:ts`
 - backend builds must be available through `mise run build:go`
 - aggregate builds must be available through `mise run build`
+- Node package installation should be managed through `pnpm`
+- internal build and test orchestration may be implemented through `Nx`, surfaced through `mise`
 
 ## Local Inner Loop
 
@@ -461,6 +563,7 @@ The repo should define canonical fixtures for:
 - Kata validation
 - telemetry redaction validation
 - safe fake secrets and auth placeholders for local validation
+- dependency-update and secret-scan fixtures where appropriate
 
 Fixtures should model behaviors and contracts, not only internal implementation shapes.
 
@@ -492,7 +595,7 @@ Manual scope should be limited to:
 
 - BIOS or UEFI virtualization settings
 - hypervisor installation and configuration
-- secret backend login and operator credentials
+- Infisical login and operator credentials
 
 ### NixOS Responsibilities
 
@@ -857,10 +960,14 @@ Execution details live in:
 
 - repo contains declarative host and cluster definitions
 - `mise` is the primary documented entrypoint for operator workflows
-- secrets flow through `fnox` backed by `1Password`
+- active secret management is documented through [Secret Management](secret-management.md)
+- declarative local secret UX is documented through [Secret Management](secret-management.md) and [Repository Tooling](repository-tooling.md)
 - secret values are not stored in `nix`, committed manifests, or repo-managed `.env` files
 - `hk` hooks run locally
 - the public formatting, linting, typechecking, build, and validation surface is documented
+- the active repository tooling model is documented through [Repository Tooling](repository-tooling.md)
+- pre-commit secret scanning is documented and part of the expected repo workflow
+- Buildkite CI and RenovateBot policy are documented as part of the repo tooling model
 - the repo-wide testing strategy is documented in [Testing Strategy](testing-strategy.md)
 - fast local behavior tests do not require full cluster bring-up whenever possible
 - slower platform verification exists separately for localhost-only exposure, network policy, auth handling, and telemetry redaction

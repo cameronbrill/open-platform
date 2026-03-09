@@ -25,6 +25,8 @@ source_docs:
 related_docs:
   - "docs/plans/README.md"
   - "docs/adr/0001-platform-architecture.md"
+  - "docs/specs/platform/secret-management.md"
+  - "docs/specs/platform/repository-tooling.md"
   - "docs/specs/platform/testing-strategy.md"
   - "docs/specs/platform/tech-spec.md"
 ---
@@ -66,7 +68,8 @@ This file is intentionally roadmap-oriented. Detailed execution lives in the num
 Outcome:
 
 - manual host, account, and secret prerequisites are complete
-- `1Password` + `fnox` bootstrap works for the operator
+- Infisical backend access works for the operator and CI prerequisites are available
+- local declarative `fnox` secret workflows are ready for repo use
 - blocking choices are captured in ADRs or explicitly deferred
 
 ### Milestone 1: Repo and Workflow Foundations
@@ -75,8 +78,9 @@ Outcome:
 
 - repo skeleton exists
 - `mise` is the operator entrypoint
+- `pnpm`, `Nx`, and `@nx-go/nx-go` repo conventions are established
 - project-level OpenCode config, agents, and skills are committed to the repo
-- `hk` and `fnox` conventions are in place
+- `hk`, Infisical secret scanning, declarative `fnox` secret UX, Buildkite, and Renovate foundations are in place
 - QMD discovery is repo-managed and refreshable through `mise`
 - docs refresh automation exists for active docs work
 - formatting, linting, typechecking, build, and validation task surfaces are documented
@@ -125,6 +129,7 @@ Outcome:
 - telemetry redaction is enforced
 - localhost-only, least-privilege, and auth leakage assumptions are validated
 - slower platform and security regression suites exist for critical guarantees
+- Buildkite-backed slow validation and dependency-update gates are in place
 
 ## Milestone Dependency Graph
 
@@ -144,6 +149,7 @@ Outcome:
 - localhost-only security posture is verified
 - the API boundary between backend and frontend is documented before UI implementation
 - build, lint, typecheck, format, and validation commands are documented through `mise`
+- package management, orchestration, CI, dependency automation, and secret scanning are documented through living specs
 - fast local behavior tests exist for repo-owned code and contracts
 - slower platform verification exists for environment-sensitive behaviors
 - Tilt remains optional and is not required for v1 completion

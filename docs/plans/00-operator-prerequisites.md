@@ -26,6 +26,8 @@ blocks:
   - "docs/plans/06-observability-and-hardening.md"
 related_docs:
   - "docs/adr/README.md"
+  - "docs/specs/platform/secret-management.md"
+  - "docs/specs/platform/repository-tooling.md"
   - "docs/specs/platform/testing-strategy.md"
   - "docs/specs/platform/tech-spec.md"
   - "docs/plans/initial-implementation-plan.md"
@@ -80,18 +82,29 @@ These must be captured in [ADRs](../adr/README.md) when they become durable arch
 
 ### Account and Secret Prerequisites
 
-- install and sign in to the `1Password` desktop app
-- install the `1Password` CLI
-- confirm `fnox` can retrieve secrets through `1Password`
+- create or access the Infisical organization, project, and environments needed for the repo
+- install and authenticate the `Infisical` CLI
+- confirm local secret access works from the intended operator environment
+- install or bootstrap `fnox` if it is required in the local operator path
+- confirm repo-declared local secret workflows work through `fnox`
 - create or confirm model provider account and API credentials
 - create Better Stack account, sources, and tokens
 - decide password generation and storage approach for `OPENCODE_SERVER_PASSWORD`
+
+### CI And Automation Prerequisites
+
+- create or confirm Buildkite organization and pipeline access
+- decide the Buildkite agent model needed for the repo
+- provision the Infisical CI auth/bootstrap mechanism
 
 ### Frontend and Backend Preconditions
 
 - confirm the preferred stack direction: Go backend and TypeScript frontend
 - confirm that v1 uses an explicit API contract before UI implementation
 - confirm that v1 avoids SSR and avoids `React Router`
+- confirm `pnpm` as the Node package manager
+- confirm `Nx` as the orchestration and caching layer
+- confirm `@nx-go/nx-go` as the Go/Nx integration path
 
 ### Operator Tooling Prerequisites
 
@@ -101,15 +114,18 @@ These must be captured in [ADRs](../adr/README.md) when they become durable arch
 - confirm understanding of Windows host vs VM vs cluster locality
 - confirm understanding that `mise` is the supported validation and testing path
 - confirm that Tilt is optional and not a prerequisite
+- confirm understanding that Buildkite runs repo-owned tasks rather than defining a separate public workflow surface
 
 ## Completion Checklist
 
 - [ ] virtualization is enabled
 - [ ] hypervisor is selected and installed
 - [ ] VM resource budget is decided
-- [ ] model provider credentials are available in `1Password`
-- [ ] Better Stack credentials are available in `1Password`
-- [ ] `fnox` is usable with `1Password`
+- [ ] model provider credentials are available in Infisical
+- [ ] Better Stack credentials are available in Infisical
+- [ ] local Infisical CLI access works
+- [ ] local `fnox`-mediated secret workflows work
+- [ ] Buildkite prerequisites are available for CI setup
 - [ ] operator understands host vs VM vs cluster access model
 - [ ] blocking architecture decisions are captured in ADRs or explicitly deferred
 
