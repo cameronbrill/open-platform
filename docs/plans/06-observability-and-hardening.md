@@ -22,6 +22,7 @@ depends_on:
 blocks:
   - "v1 completion"
 related_docs:
+  - "docs/specs/platform/testing-strategy.md"
   - "docs/specs/platform/tech-spec.md"
   - "docs/plans/04-session-runtime.md"
   - "docs/plans/05-session-index-and-operator-ux.md"
@@ -84,11 +85,26 @@ Finish v1 by adding observability and validating the security posture.
 - verify restricted egress behavior
 - verify runtime hardening baseline
 
+### Platform Verification Layers
+
+- define which checks belong to integration tests, platform smoke tests, and security regressions
+- keep these slower verification layers separate from the fast local loop
+- Tilt may optionally assist repeated slow verification, but must not replace `mise` workflows
+
+Minimum required security regressions should include:
+
+- unauthorized or malformed open-session attempts
+- secret leakage checks for logs, URLs, and telemetry
+- localhost-only exposure verification
+- deny-by-default egress and blocked lateral movement checks
+- absence of unnecessary Kubernetes API credentials in session pods
+
 ### Final Validation
 
 - run acceptance-criteria smoke tests
 - validate auth-open flow and failure handling
 - record remaining gaps as follow-up work
+- explicitly cover localhost-only exposure, network policy behavior, auth leakage, and telemetry redaction
 
 ## Validation
 
@@ -96,12 +112,14 @@ Finish v1 by adding observability and validating the security posture.
 - no sensitive defaults leak
 - localhost-only behavior is confirmed
 - final acceptance criteria can be demonstrated
+- slower platform verification suites confirm the expected security and observability behaviors
 
 ## Exit Criteria
 
 - v1 security and observability assumptions are tested
 - the platform is ready for real use as a single-user localhost-only system
 - follow-up work for remote access or future refinements is clearly separated
+- slow verification loops exist independently of fast local tests
 
 ## Risks / Notes
 

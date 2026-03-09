@@ -17,9 +17,11 @@ tags:
 source_of_truth: "durable-decision"
 related_docs:
   - "docs/specs/platform/tech-spec.md"
+  - "docs/specs/platform/testing-strategy.md"
   - "docs/specs/platform/session-index-api.md"
   - "docs/specs/platform/session-index-ux.md"
   - "docs/plans/05-session-index-and-operator-ux.md"
+  - "docs/adr/0007-testing-strategy-and-inner-feedback-loops.md"
 supersedes: []
 superseded_by: []
 ---
@@ -54,6 +56,7 @@ Use the following v1 direction for the session index application:
 - backend code prefers `Go`
 - frontend code prefers `TypeScript`
 - an explicit typed API contract must be documented before UI implementation
+- the API contract is also a contract-test artifact for backend/frontend behavior
 - v1 avoids SSR
 - v1 avoids `React Router`
 - a thin frontend served as static assets is acceptable in v1
@@ -98,6 +101,7 @@ Not chosen as the default because:
 - clear frontend/backend contract
 - strong typing across both sides of the operator UI
 - lower risk of the index UI growing into a second session client
+- lower risk of brittle test suites that overfit to backend/frontend implementation details
 
 ### Negative
 
@@ -108,3 +112,5 @@ Not chosen as the default because:
 
 - define the detailed API contract in [Session Index API](../specs/platform/session-index-api.md)
 - define the detailed UI model in [Session Index UX](../specs/platform/session-index-ux.md)
+- define the testing policy in [Testing Strategy](../specs/platform/testing-strategy.md)
+- require contract-test coverage for the session index API boundary

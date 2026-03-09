@@ -20,6 +20,7 @@ related_docs:
   - "docs/adr/README.md"
   - "docs/specs/README.md"
   - "docs/plans/README.md"
+  - "docs/specs/platform/testing-strategy.md"
 ---
 
 # Documentation
@@ -52,6 +53,7 @@ Open Platform treats repository docs as the primary source of truth for architec
 | [ADR-0004: Local Substrate Selection](adr/0004-local-substrate-selection.md) | proposed | hypervisor, networking, and local cluster substrate choices |
 | [ADR-0005: Session Exposure and Routing](adr/0005-session-exposure-and-routing.md) | proposed | session URL resolution and localhost-only routing direction |
 | [ADR-0006: Session Index Stack and API Boundary](adr/0006-session-index-stack-and-api-boundary.md) | accepted | Go and TypeScript split, thin UI boundary, and API-first rule |
+| [ADR-0007: Testing Strategy and Inner Feedback Loops](adr/0007-testing-strategy-and-inner-feedback-loops.md) | accepted | behavior-focused TDD, layered test loops, and optional Tilt scope |
 
 ## Specs
 
@@ -60,6 +62,7 @@ Open Platform treats repository docs as the primary source of truth for architec
 | [Specs Index](specs/README.md) | active | navigate active specs |
 | [Platform Specs Index](specs/platform/README.md) | active | navigate platform spec docs |
 | [Open Platform Technical Specification](specs/platform/tech-spec.md) | draft | current intended platform design and implementation requirements |
+| [Testing Strategy](specs/platform/testing-strategy.md) | draft | behavior-focused TDD policy, layered test loops, and feedback-loop guidance |
 | [Session Index API](specs/platform/session-index-api.md) | draft | typed frontend and backend API contract |
 | [Session Index UX](specs/platform/session-index-ux.md) | draft | operator UX model and responsive behavior |
 
@@ -84,6 +87,9 @@ Open Platform treats repository docs as the primary source of truth for architec
 - v1 requires an explicit frontend and backend API contract before UI implementation.
 - v1 avoids SSR and avoids `React Router`.
 - `dprint` is the public formatting entrypoint.
+- Behavior-focused TDD is the default engineering policy per [ADR-0007](adr/0007-testing-strategy-and-inner-feedback-loops.md).
+- `mise` is the public entrypoint for validation and testing workflows.
+- Tilt is optional and only used for slower integration and platform loops.
 
 ## QMD And Obsidian Notes
 

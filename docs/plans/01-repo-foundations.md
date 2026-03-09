@@ -27,9 +27,11 @@ blocks:
   - "docs/plans/06-observability-and-hardening.md"
 related_docs:
   - "docs/README.md"
+  - "docs/specs/platform/testing-strategy.md"
   - "docs/specs/platform/tech-spec.md"
   - "docs/specs/platform/session-index-api.md"
   - "docs/specs/platform/session-index-ux.md"
+  - "docs/adr/0007-testing-strategy-and-inner-feedback-loops.md"
 ---
 
 # Repo Foundations
@@ -71,6 +73,7 @@ Establish the repo as the single source of truth for configuration, tasks, hooks
   - `telemetry/betterstack/`
 - documented repo task conventions
 - documented API and UX spec locations
+- documented testing strategy location and test task conventions
 
 ## Tasks
 
@@ -95,10 +98,20 @@ Establish the repo as the single source of truth for configuration, tasks, hooks
   - `build`
   - `build:ts`
   - `build:go`
+  - `test`
+  - `test:go`
+  - `test:ts`
+  - `test:contract`
+  - `test:integration`
+  - `test:e2e`
+  - `cluster:smoke`
+  - `security:smoke`
+  - `obs:smoke`
   - `validate`
   - `check`
 - make `mise` the primary public interface
 - reserve internal-only helper namespaces for implementation details
+- reserve optional `dev:tilt` as a contributor-only accelerator for slow loops
 
 ### Formatting, Linting, and Typechecking Policy
 
@@ -108,6 +121,15 @@ Establish the repo as the single source of truth for configuration, tasks, hooks
 - define `oxlint` for TypeScript linting
 - define `golangci-lint` for Go linting
 - define `tsc --noEmit` for TypeScript typechecking
+
+### Test Task Conventions
+
+- define fast local behavior-focused tasks for unit, component, and contract testing
+- define slower integration and end-to-end tasks separately from the fast loop
+- keep `check` focused on the fast local loop unless explicitly documented otherwise
+- keep Tilt optional and layered under `mise` rather than exposing it as the primary path
+- treat `fmt`, `lint`, `typecheck`, `build`, `test`, `test:go`, `test:ts`, `test:contract`, `validate`, and `check` as the minimum required v1 surface
+- treat `test:integration`, `test:e2e`, `cluster:smoke`, `security:smoke`, and `obs:smoke` as milestone-gated capabilities that may arrive later than the fast loop
 
 ### `hk` Hook Policy
 
@@ -138,8 +160,9 @@ Establish the repo as the single source of truth for configuration, tasks, hooks
 ### Local Inner Loop and Fixtures
 
 - define a fast loop for docs, frontend, and task-surface work
-- define a full loop for VM, cluster, and Kata validation
-- reserve fixture strategy for sample repos, network policy, Kata, and telemetry redaction
+- define a default `mise` integration loop for cross-boundary behavior
+- define an optional Tilt-assisted slow loop for repeated platform validation
+- reserve fixture strategy for sample repos, API payloads, network policy, Kata, and telemetry redaction
 
 ## Validation
 
@@ -151,12 +174,14 @@ Establish the repo as the single source of truth for configuration, tasks, hooks
 - docs discovery can refresh automatically during docs work
 - repo layout matches the tech spec
 - API and UX spec locations are clearly documented
+- layered test and validation task names are documented through `mise`
 
 ## Exit Criteria
 
 - repo has a clean implementation skeleton
 - task, formatting, linting, and hook ownership are clear
 - docs discovery and agent config are reproducible across checkouts
+- fast and slow validation loops are documented and distinguished
 - no ambiguity remains about `mise` vs scripts vs `nix` ownership
 
 ## Risks / Notes

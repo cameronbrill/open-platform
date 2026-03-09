@@ -25,6 +25,7 @@ source_docs:
 related_docs:
   - "docs/plans/README.md"
   - "docs/adr/0001-platform-architecture.md"
+  - "docs/specs/platform/testing-strategy.md"
   - "docs/specs/platform/tech-spec.md"
 ---
 
@@ -79,6 +80,7 @@ Outcome:
 - QMD discovery is repo-managed and refreshable through `mise`
 - docs refresh automation exists for active docs work
 - formatting, linting, typechecking, build, and validation task surfaces are documented
+- the layered testing strategy and fast/slow feedback loops are documented
 
 ### Milestone 2: VM Bootstrap
 
@@ -104,6 +106,7 @@ Outcome:
 - one isolated OpenCode session runs in Kubernetes
 - a local browser can reach one authenticated `opencode web` session
 - runtime secret flow and per-session auth behavior are documented and working
+- runtime behavior tests exist for the session lifecycle
 
 ### Milestone 5: Session Index and Operator UX
 
@@ -112,6 +115,7 @@ Outcome:
 - operator can create, open, inspect, and delete sessions through supported flows
 - the session API contract, state model, and UX spec are documented before implementation coupling grows
 - recovery commands exist for common failure cases
+- API contract tests and UI behavior tests exist for the session index boundary
 
 ### Milestone 6: Observability and Hardening
 
@@ -120,6 +124,7 @@ Outcome:
 - OTEL and Better Stack are wired
 - telemetry redaction is enforced
 - localhost-only, least-privilege, and auth leakage assumptions are validated
+- slower platform and security regression suites exist for critical guarantees
 
 ## Milestone Dependency Graph
 
@@ -139,6 +144,9 @@ Outcome:
 - localhost-only security posture is verified
 - the API boundary between backend and frontend is documented before UI implementation
 - build, lint, typecheck, format, and validation commands are documented through `mise`
+- fast local behavior tests exist for repo-owned code and contracts
+- slower platform verification exists for environment-sensitive behaviors
+- Tilt remains optional and is not required for v1 completion
 - the design is ready for a later authenticated remote-access layer
 
 ## Risks / Notes
