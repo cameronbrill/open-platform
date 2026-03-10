@@ -1,22 +1,22 @@
 {
-    "$schema": "https://opencode.ai/config.json",
-    "instructions": ["docs/README.md", "AGENTS.md"],
-    "mcp": {
-        "qmd": {
-            "type": "local",
-            "command": [
-                "mise",
-                "exec",
-                "node@22",
-                "npm:@tobilu/qmd@1.1.5",
-                "--",
-                "qmd",
-                "--index",
-                "open-platform",
-                "mcp"
-            ],
-            "enabled": true,
-            "timeout": 10000
-        }
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": ["docs/README.md", "AGENTS.md"],
+  "mcp": {
+    "qmd": {
+      "type": "local",
+      "command": [
+        "mise",
+        "exec",
+        "node@22",
+        "npm:@tobilu/qmd@1.1.5",
+        "--",
+        "qmd",
+        "--index",
+        "open-platform",
+        "mcp"
+      ],
+      "enabled": true,
+      "timeout": 10000
     }
+  }
 }

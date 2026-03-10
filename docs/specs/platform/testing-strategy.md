@@ -113,18 +113,18 @@ Use for network policy, localhost-only exposure, runtime auth behavior, telemetr
 
 ## Change Type To Test Layer Matrix
 
-| Change Type | Primary Layer | Secondary Layer When Needed |
-| --- | --- | --- |
-| backend domain logic | unit | integration |
-| frontend operator-visible state | component | end-to-end |
-| session index API payload or error behavior | contract | integration |
-| session create/open/delete UX | component or integration | end-to-end |
-| status mapping and normalization | contract | integration |
-| localhost-only exposure | platform smoke | security regression |
-| network policy and egress restrictions | platform smoke | security regression |
-| auth handling and auth failure behavior | contract or integration | security regression |
-| telemetry redaction and secret non-leakage | security regression | platform smoke |
-| Kata/runtime substrate behavior | platform smoke | end-to-end |
+| Change Type                                 | Primary Layer            | Secondary Layer When Needed |
+| ------------------------------------------- | ------------------------ | --------------------------- |
+| backend domain logic                        | unit                     | integration                 |
+| frontend operator-visible state             | component                | end-to-end                  |
+| session index API payload or error behavior | contract                 | integration                 |
+| session create/open/delete UX               | component or integration | end-to-end                  |
+| status mapping and normalization            | contract                 | integration                 |
+| localhost-only exposure                     | platform smoke           | security regression         |
+| network policy and egress restrictions      | platform smoke           | security regression         |
+| auth handling and auth failure behavior     | contract or integration  | security regression         |
+| telemetry redaction and secret non-leakage  | security regression      | platform smoke              |
+| Kata/runtime substrate behavior             | platform smoke           | end-to-end                  |
 
 ## Inner Feedback Loops
 

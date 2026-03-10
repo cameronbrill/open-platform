@@ -1,0 +1,159 @@
+{
+  "$schema": "./node_modules/nx/schemas/project-schema.json",
+  "name": "repo",
+  "root": ".",
+  "targets": {
+    "fmt": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "dprint fmt",
+          "node scripts/run-go-task.mjs fmt"
+        ],
+        "parallel": false
+      }
+    },
+    "fmt-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "dprint check",
+          "node scripts/run-go-task.mjs fmt:check"
+        ],
+        "parallel": false
+      }
+    },
+    "lint-ts": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "oxlint . --ignore-path .gitignore"
+      }
+    },
+    "lint-go": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node scripts/run-go-task.mjs lint"
+      }
+    },
+    "lint": {
+      "dependsOn": ["lint-ts", "lint-go"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node -e \"process.exit(0)\""
+      }
+    },
+    "typecheck-ts": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit --pretty false -p tsconfig.json"
+      }
+    },
+    "typecheck": {
+      "dependsOn": ["typecheck-ts"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node -e \"process.exit(0)\""
+      }
+    },
+    "build-ts": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node scripts/task-status.mjs build:ts success"
+      }
+    },
+    "build-go": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node scripts/run-go-task.mjs build"
+      }
+    },
+    "build": {
+      "dependsOn": ["build-ts", "build-go"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node -e \"process.exit(0)\""
+      }
+    },
+    "test-ts": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node scripts/task-status.mjs test:ts success"
+      }
+    },
+    "test-go": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node scripts/run-go-task.mjs test"
+      }
+    },
+    "test-contract": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node scripts/task-status.mjs test:contract success"
+      }
+    },
+    "test": {
+      "dependsOn": ["test-ts", "test-go", "test-contract"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node -e \"process.exit(0)\""
+      }
+    },
+    "test-integration": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node scripts/task-status.mjs test:integration fail"
+      }
+    },
+    "test-e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node scripts/task-status.mjs test:e2e fail"
+      }
+    },
+    "cluster-smoke": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node scripts/task-status.mjs cluster:smoke fail"
+      }
+    },
+    "security-smoke": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node scripts/task-status.mjs security:smoke fail"
+      }
+    },
+    "obs-smoke": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node scripts/task-status.mjs obs:smoke fail"
+      }
+    },
+    "dev-tilt": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node scripts/task-status.mjs dev:tilt fail"
+      }
+    },
+    "secrets-scan": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node scripts/secrets-scan.mjs"
+      }
+    },
+    "check": {
+      "dependsOn": ["secrets-scan", "fmt-check", "lint", "typecheck", "test"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node -e \"process.exit(0)\""
+      }
+    },
+    "validate": {
+      "dependsOn": ["check", "build"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node -e \"process.exit(0)\""
+      }
+    }
+  }
+}

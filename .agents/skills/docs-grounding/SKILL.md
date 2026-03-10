@@ -6,6 +6,7 @@ metadata:
   audience: maintainers
   scope: project-docs
 ---
+
 ## What I do
 
 - Start with `docs/README.md` to identify the right source documents.

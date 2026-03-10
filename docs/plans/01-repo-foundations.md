@@ -4,7 +4,7 @@ doc_id: "PLAN-001"
 doc_type: "plan"
 status: "draft"
 date: "2026-03-08"
-updated: "2026-03-09"
+updated: "2026-03-10"
 summary: "Repository skeleton, task surface, package/tooling foundations, CI automation, and docs discovery conventions for the platform."
 aliases:
   - "Plan 01"
@@ -53,7 +53,7 @@ Establish the repo as the single source of truth for configuration, tasks, hooks
 - `.npmrc`
 - `pnpm-lock.yaml`
 - `nx.json`
-- `.config/hk/`
+- `hk.pkl`
 - `.buildkite/`
 - `renovate.json`
 - `.infisical-scan.toml`
@@ -76,13 +76,19 @@ Establish the repo as the single source of truth for configuration, tasks, hooks
 - `pnpm-workspace.yaml`
 - `.npmrc`
 - `pnpm-lock.yaml`
+- `package.json`
+- `project.json`
+- `tsconfig.base.json`
+- `tsconfig.json`
+- `dprint.json`
+- `.gitignore`
 - `nx.json`
 - `AGENTS.md`
 - `opencode.json`
 - `.agents/agents/`
 - `.agents/skills/`
 - `.opencode/agents -> ../.agents/agents`
-- `.config/hk/`
+- `hk.pkl`
 - `.buildkite/`
 - `renovate.json`
 - `.infisical-scan.toml`

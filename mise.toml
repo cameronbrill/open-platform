@@ -1,10 +1,19 @@
 [tools]
-node = "22"
+node = "22.22.1"
+pnpm = "10.32.0"
+go = "1.25.8"
+golangci-lint = "2.11.3"
+dprint = "0.52.0"
+hk = "1.38.0"
+pkl = "0.31.0"
 "npm:@tobilu/qmd" = "1.1.5"
-"npm:@withgraphite/graphite-cli" = "stable"
+"npm:@withgraphite/graphite-cli" = "1.7.20"
+"npm:@infisical/cli" = "0.43.40"
+"ubi:jdx/fnox" = "1.17.0"
 watchexec = "2.5.0"
 
 [env]
+HK_MISE = "1"
 QMD_INDEX = "open-platform"
 QMD_COLLECTION = "docs"
 
@@ -87,3 +96,95 @@ qmd --index "$QMD_INDEX" search "session index api contract" -c "$QMD_COLLECTION
 qmd --index "$QMD_INDEX" search "localhost-only exposure" -c "$QMD_COLLECTION" -n 3 >/dev/null
 echo "QMD smoke queries completed"
 '''
+
+[tasks.fmt]
+description = "Format repo-managed sources"
+run = "pnpm exec nx run repo:fmt"
+
+[tasks."fmt:check"]
+description = "Check repo formatting"
+run = "pnpm exec nx run repo:fmt-check"
+
+[tasks.lint]
+description = "Run all lint checks"
+run = "pnpm exec nx run repo:lint"
+
+[tasks."lint:ts"]
+description = "Run TypeScript lint checks"
+run = "pnpm exec nx run repo:lint-ts"
+
+[tasks."lint:go"]
+description = "Run Go lint checks"
+run = "pnpm exec nx run repo:lint-go"
+
+[tasks.typecheck]
+description = "Run all type checks"
+run = "pnpm exec nx run repo:typecheck"
+
+[tasks."typecheck:ts"]
+description = "Run TypeScript type checks"
+run = "pnpm exec nx run repo:typecheck-ts"
+
+[tasks.build]
+description = "Run all build targets"
+run = "pnpm exec nx run repo:build"
+
+[tasks."build:ts"]
+description = "Run TypeScript build targets"
+run = "pnpm exec nx run repo:build-ts"
+
+[tasks."build:go"]
+description = "Run Go build targets"
+run = "pnpm exec nx run repo:build-go"
+
+[tasks."secrets:scan"]
+description = "Run repo secret scanning"
+run = "pnpm exec nx run repo:secrets-scan"
+
+[tasks.test]
+description = "Run fast local tests"
+run = "pnpm exec nx run repo:test"
+
+[tasks."test:go"]
+description = "Run Go tests"
+run = "pnpm exec nx run repo:test-go"
+
+[tasks."test:ts"]
+description = "Run TypeScript tests"
+run = "pnpm exec nx run repo:test-ts"
+
+[tasks."test:contract"]
+description = "Run contract tests"
+run = "pnpm exec nx run repo:test-contract"
+
+[tasks."test:integration"]
+description = "Run integration tests"
+run = "pnpm exec nx run repo:test-integration"
+
+[tasks."test:e2e"]
+description = "Run end-to-end tests"
+run = "pnpm exec nx run repo:test-e2e"
+
+[tasks."cluster:smoke"]
+description = "Run cluster smoke validation"
+run = "pnpm exec nx run repo:cluster-smoke"
+
+[tasks."security:smoke"]
+description = "Run security smoke validation"
+run = "pnpm exec nx run repo:security-smoke"
+
+[tasks."obs:smoke"]
+description = "Run observability smoke validation"
+run = "pnpm exec nx run repo:obs-smoke"
+
+[tasks.validate]
+description = "Run fast checks and builds"
+run = "pnpm exec nx run repo:validate"
+
+[tasks.check]
+description = "Run the fast local check loop"
+run = "pnpm exec nx run repo:check"
+
+[tasks."dev:tilt"]
+description = "Run optional Tilt accelerator"
+run = "pnpm exec nx run repo:dev-tilt"

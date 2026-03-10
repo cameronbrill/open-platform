@@ -4,7 +4,7 @@ doc_id: "SPEC-PLATFORM-001"
 doc_type: "spec"
 status: "draft"
 date: "2026-03-08"
-updated: "2026-03-09"
+updated: "2026-03-10"
 summary: "Current intended design and implementation requirements for the local single-user OpenCode platform."
 aliases:
   - "Platform Tech Spec"
@@ -131,15 +131,21 @@ Implications:
 open-platform/
   README.md
   AGENTS.md
+  .gitignore
   mise.toml
+  dprint.json
+  package.json
   nx.json
   pnpm-workspace.yaml
   .npmrc
   pnpm-lock.yaml
+  project.json
+  tsconfig.base.json
+  tsconfig.json
+  hk.pkl
+  fnox.toml
   opencode.json
   renovate.json
-  flake.nix
-  flake.lock
 
   .buildkite/
     pipeline.yml
@@ -184,38 +190,21 @@ open-platform/
     plans/
       README.md
 
-  .config/
-    hk/
-
   nixos/
     hosts/
-      op-platform-vm.nix
+      README.md
     modules/
-      base.nix
-      ssh.nix
-      minikube.nix
-      kata.nix
-      k9s.nix
-      opencode-tools.nix
-      reverse-proxy.nix
+      README.md
 
   cluster/
     base/
-      namespaces.yaml
-      quotas.yaml
-      limitranges.yaml
-      networkpolicy-default-deny.yaml
-      ingress.yaml
+      README.md
     kata/
-      runtimeclass.yaml
-      install.yaml
+      README.md
     sessions/
-      opencode-session.yaml
-      service.yaml
-      ingress.yaml
-      workspace-pvc.yaml
+      README.md
     observability/
-      otel-collector.yaml
+      README.md
 
   apps/
     session-index/
@@ -224,8 +213,7 @@ open-platform/
 
   images/
     opencode-session/
-      Dockerfile
-      entrypoint.sh
+      README.md
 
   telemetry/
     betterstack/
@@ -234,15 +222,10 @@ open-platform/
       alerts.md
 
   scripts/
-    bootstrap-vm
-    cluster-up
-    cluster-doctor
-    session-create
-    session-delete
-    session-list
-    session-open
-    session-logs
-    cluster-reset
+    README.md
+    run-go-task.mjs
+    secrets-scan.mjs
+    task-status.mjs
 ```
 
 ## System Context
@@ -339,6 +322,7 @@ Owns:
 Responsibilities:
 
 - install and pin required CLI tools, including docs discovery and file-watching tools
+- install repo-managed CLIs such as `pnpm`, `dprint`, `hk`, `pkl`, `fnox`, and `Infisical`
 - define repeatable local tasks
 - provide a standard shell or task environment
 - invoke secrets-aware, package, and orchestration tooling through a stable repo-owned interface
@@ -435,6 +419,8 @@ Requirements:
 `hk` manages git hooks from the repo.
 
 Hooks should route through `mise` tasks rather than invoking raw tools directly.
+
+The committed hook configuration lives at the repo root in `hk.pkl`.
 
 ### `Tilt`
 
@@ -672,11 +658,11 @@ The final platform should document:
 
 Until a later ADR or accepted spec changes the rule set, downstream implementation should assume:
 
-| Operation | Workspace behavior | Secret/auth behavior |
-| --- | --- | --- |
-| create | create a fresh isolated workspace for that session | materialize only the secret and auth state needed for that session |
-| restart | preserve the existing session workspace by default | recreate or revalidate any session-scoped auth material needed after restart |
-| delete | remove the session workspace and its PVC | invalidate and remove session-scoped auth material |
+| Operation     | Workspace behavior                                                                           | Secret/auth behavior                                                           |
+| ------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| create        | create a fresh isolated workspace for that session                                           | materialize only the secret and auth state needed for that session             |
+| restart       | preserve the existing session workspace by default                                           | recreate or revalidate any session-scoped auth material needed after restart   |
+| delete        | remove the session workspace and its PVC                                                     | invalidate and remove session-scoped auth material                             |
 | cluster reset | remove local session workspaces and other session state needed to return to a clean baseline | remove session-scoped auth material and other reset-owned runtime secret state |
 
 v1 should not assume a shared clone cache by default. If clone reuse is introduced later, it must be documented explicitly with its isolation and cleanup rules.
@@ -865,7 +851,7 @@ At a minimum, the session index must define:
 1. session resources are recycled or recreated
 2. index page reflects transient state
 3. workspace state is preserved by default for the same session unless a later documented recreate flow says otherwise
-3. telemetry records restart cause and outcome
+4. telemetry records restart cause and outcome
 
 ## Observability Design
 
