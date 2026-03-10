@@ -25,6 +25,10 @@ superseded_by: []
 
 # ADR-0004: Local Substrate Selection
 
+## Status Note
+
+This ADR is still `proposed`. Until it is accepted, downstream docs should treat the substrate details below as bounded validation targets and decision criteria rather than fully ratified long-term architecture guarantees.
+
 ## Context
 
 The platform depends on a local substrate that must support:
@@ -50,6 +54,16 @@ Several decisions materially affect feasibility and security:
 ## Proposed Direction
 
 Before implementation moves beyond foundations, the platform must settle on one supported v1 substrate matrix and record it here.
+
+Until that happens, the current validation target is intentionally narrow:
+
+- Windows host plus `NixOS` VM remains the working control-plane direction
+- `minikube` remains the working local cluster direction
+- real `NetworkPolicy` enforcement is mandatory
+- localhost-only browser exposure is mandatory
+- Kata viability is a go or no-go gate for the current v1 isolation model
+
+The still-open matrix choices are the exact hypervisor path, VM networking mode, `minikube` driver, container runtime, CNI, ingress/controller behavior, storage behavior, and local image workflow.
 
 The chosen substrate must:
 

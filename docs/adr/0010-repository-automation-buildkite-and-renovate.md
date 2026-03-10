@@ -47,6 +47,12 @@ The repo needs durable choices for CI and dependency automation that fit a docs-
 - Buildkite jobs run repo-owned tasks
 - fast and slow loops can be separated in CI
 
+#### CI Trust Boundary
+
+- jobs that run on untrusted changes must not receive Infisical-backed runtime secrets or other privileged credentials
+- only documented trusted jobs may authenticate to `Infisical`
+- CI logs and artifacts must avoid secret-bearing output and should not become an alternate secret transport mechanism
+
 ### RenovateBot
 
 - Renovate opens update PRs according to repo policy

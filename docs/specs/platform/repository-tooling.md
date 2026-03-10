@@ -187,6 +187,13 @@ Use `Nx` as the internal execution engine for repo tasks, while keeping `mise` a
 - separate fast and slow validation where appropriate
 - preserve local and CI parity by avoiding bespoke CI-only command surfaces
 
+### CI Trust Boundary
+
+- Buildkite is the CI runner, but not every job is equally trusted
+- jobs on untrusted changes should run secret-free validation only
+- only documented trusted jobs may access Infisical-backed secrets or other privileged credentials
+- CI logs and artifacts must avoid secret-bearing output and should not become an alternate secret transport path
+
 Fast checks should be cheap enough for routine PR use. Slower platform and security loops may run on broader gates such as `main`, scheduled builds, or explicitly promoted CI paths.
 
 ### Local vs CI Parity
@@ -239,6 +246,8 @@ The canonical staged scan should be routed through `mise` rather than a bespoke 
 - use `Graphite` for all normal git operations
 - follow the multi-module Go conventions when adding Go code
 - treat Buildkite as the CI runner for repo-owned tasks, not as a separate manual workflow surface
+
+If a contribution path is intentionally untrusted, expect secret-free validation rather than privileged CI behavior.
 
 ## Acceptance Criteria
 

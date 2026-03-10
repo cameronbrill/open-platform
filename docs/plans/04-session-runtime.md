@@ -62,7 +62,7 @@ Implement the first end-to-end session runtime.
 - `cluster/sessions/service.yaml`
 - `cluster/sessions/ingress.yaml`
 - `cluster/sessions/workspace-pvc.yaml`
-- documented session auth and secret materialization behavior
+- documented session auth, open-session, secret materialization, and workspace lifecycle behavior
 
 ## Tasks
 
@@ -80,6 +80,7 @@ Implement the first end-to-end session runtime.
 - generate per-session auth material where practical
 - document how task-mediated Infisical retrieval provides runtime secrets to the pod
 - ensure secret values do not land in committed artifacts or persistent debug output
+- align the runtime open-session behavior with the canonical `GET /sessions/{id}/open` contract
 
 ### Session Pod Security
 
@@ -92,7 +93,9 @@ Implement the first end-to-end session runtime.
 - implement `git clone per session`
 - define naming, cleanup, and isolation rules
 - assess whether a local clone cache is needed
-- define restart and recreate semantics relative to workspace cleanup
+- keep restart semantics workspace-preserving by default for the same session unless a later documented recreate flow says otherwise
+- keep delete semantics workspace-destructive for the deleted session
+- treat cluster reset as destructive cleanup of session workspaces and related session state
 
 ### Session Routing
 
@@ -100,6 +103,7 @@ Implement the first end-to-end session runtime.
 - switch to host-based routing if needed
 - ensure browser access remains localhost-only
 - ensure routing decisions remain compatible with the API contract
+- keep raw reusable credentials out of normal API responses and out of operator-visible URLs
 
 ### Runtime Behavior Tests
 
@@ -113,6 +117,8 @@ Implement the first end-to-end session runtime.
 - a manual session pod is reachable in browser
 - the pod uses `runtimeClassName: kata`
 - the session workspace is isolated
+- restart preserves workspace state for the same session by default
+- delete removes the session workspace and invalidates session-scoped auth material
 - the session can be deleted and recreated cleanly
 - no unnecessary Kubernetes API credentials are present
 - auth exists and is enforced

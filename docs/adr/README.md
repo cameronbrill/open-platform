@@ -29,15 +29,16 @@ ADRs capture durable platform choices and rationale. Use them to answer why a de
 ## Reading Rules
 
 - Read the matching spec after an ADR when you need current intended behavior or contracts.
-- Proposed ADRs represent active decisions that still need confirmation.
+- Proposed ADRs represent the current working direction, but they still need confirmation before downstream docs should treat them as fully ratified.
 - Accepted ADRs remain authoritative until superseded by a newer ADR.
+- Superseded ADRs remain useful historical context, but should not be treated as the active source of truth.
 
 ## ADR Set
 
 | Doc | Status | Focus |
 | --- | --- | --- |
 | [ADR-0001: Local Autonomous Coding Platform Architecture](0001-platform-architecture.md) | proposed | top-level v1 architecture, threat model, and tool ownership |
-| [ADR-0002: Secret Bootstrap and Local Secret UX](0002-secret-bootstrap-and-local-secret-ux.md) | accepted | operator bootstrap and declarative local secret UX guardrails |
+| [ADR-0002: Secret Bootstrap and Local Secret UX](0002-secret-bootstrap-and-local-secret-ux.md) | superseded | historical operator bootstrap and local secret UX guardrails |
 | [ADR-0003: Runtime Secret Materialization](0003-runtime-secret-materialization.md) | accepted | runtime secret injection and lifecycle policy |
 | [ADR-0004: Local Substrate Selection](0004-local-substrate-selection.md) | proposed | hypervisor, networking, and local cluster substrate selection |
 | [ADR-0005: Session Exposure and Routing](0005-session-exposure-and-routing.md) | proposed | session URL resolution, exposure, and routing contract |

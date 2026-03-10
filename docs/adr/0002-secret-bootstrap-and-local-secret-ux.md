@@ -2,10 +2,10 @@
 title: "ADR-0002: Secret Bootstrap and Local Secret UX"
 doc_id: "ADR-0002"
 doc_type: "adr"
-status: "accepted"
+status: "superseded"
 date: "2026-03-08"
 updated: "2026-03-09"
-summary: "Use operator-mediated bootstrap with declarative local secret UX through fnox and keep secret values out of the repo and runtime bootstrap artifacts."
+summary: "Historical rationale for operator-mediated bootstrap with declarative local secret UX through fnox; active backend and CI policy now live in ADR-0008."
 aliases:
   - "Secret Bootstrap"
   - "Local Secret UX"
@@ -17,13 +17,19 @@ tags:
 source_of_truth: "durable-decision"
 related_docs:
   - "docs/adr/0003-runtime-secret-materialization.md"
+  - "docs/adr/0008-infisical-secret-management-and-ci-auth.md"
   - "docs/specs/platform/tech-spec.md"
   - "docs/plans/00-operator-prerequisites.md"
 supersedes: []
-superseded_by: []
+superseded_by:
+  - "docs/adr/0008-infisical-secret-management-and-ci-auth.md"
 ---
 
 # ADR-0002: Secret Bootstrap and Local Secret UX
+
+## Status Note
+
+This ADR still explains why the repo uses an operator-mediated local secret UX, but [ADR-0008](0008-infisical-secret-management-and-ci-auth.md) is the active source of truth for backend selection, CI auth, and secret scanning policy.
 
 ## Context
 

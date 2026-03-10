@@ -17,6 +17,8 @@ tags:
 source_of_truth: "durable-decision"
 related_docs:
   - "docs/adr/0002-secret-bootstrap-and-local-secret-ux.md"
+  - "docs/adr/0008-infisical-secret-management-and-ci-auth.md"
+  - "docs/specs/platform/secret-management.md"
   - "docs/specs/platform/tech-spec.md"
   - "docs/plans/04-session-runtime.md"
 supersedes: []
@@ -74,4 +76,4 @@ Preferred v1 behavior:
 ## Follow-Up
 
 - align final session auth behavior with session-routing and browser auth decisions
-- define retention and secure deletion rules in the tech spec
+- define retention, revocation, and secure deletion rules in [Secret Management](../specs/platform/secret-management.md) and the tech spec

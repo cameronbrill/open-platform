@@ -83,6 +83,8 @@ Each session record should expose typed fields suitable for the operator UI:
 - `restartCount`
 - `failureReason`
 
+`url` should be absent or `null` until the backend can safely resolve an operator-visible open target.
+
 Optional future fields may include:
 
 - `lastActivityAt`
@@ -110,17 +112,30 @@ Contract tests should verify valid creation, validation failure, and rejection o
 
 Restarts or recreates the specified session according to platform policy.
 
+The working v1 default is that restart preserves the session workspace for that session unless a later documented recreate flow says otherwise.
+
 Contract tests should verify observable restart behavior and normalized restart errors.
 
 ### `DELETE /sessions/{id}`
 
 Deletes the specified session and applies the documented workspace cleanup policy.
 
+The working v1 default is that delete removes the session workspace and invalidates session-scoped auth material for that session.
+
 Contract tests should verify deletion semantics and normalized failures.
 
 ### `GET /sessions/{id}/open`
 
 Returns the resolved open URL and any operator-visible access metadata needed to open the session.
+
+Working v1 contract:
+
+- the backend owns URL resolution
+- the frontend must not guess or construct session URLs
+- if the session is not ready, the backend returns a normalized not-ready response rather than a speculative open URL
+- if the session is ready, the response includes the resolved open URL and non-secret access metadata only
+- normal API responses must not expose raw reusable credentials or embed them in URLs
+- auth failures must be distinguishable from session-startup or substrate failures
 
 Contract tests should verify ready, not-ready, and auth-related open behavior without leaking sensitive values.
 

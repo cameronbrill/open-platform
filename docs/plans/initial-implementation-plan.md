@@ -39,6 +39,8 @@ Provide the high-level execution roadmap for implementing v1 of the platform.
 
 This file is intentionally roadmap-oriented. Detailed execution lives in the numbered plans listed in the [Plans Index](README.md).
 
+Plans 03 and 04 currently depend on still-proposed ADRs for substrate and routing. Treat those plans as working execution direction until [ADR-0004](../adr/0004-local-substrate-selection.md) and [ADR-0005](../adr/0005-session-exposure-and-routing.md) are accepted or explicitly deferred.
+
 ## In Scope
 
 - sequencing the numbered implementation plans

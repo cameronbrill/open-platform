@@ -44,11 +44,17 @@ Open Platform treats repository docs as the primary source of truth for architec
 
 ## ADRs
 
+Status note:
+
+- `proposed` ADRs describe the current working direction, but downstream specs and plans should treat them as contingent until they are accepted.
+- `accepted` ADRs are the active durable decisions.
+- `superseded` ADRs remain historical context only.
+
 | Doc | Status | Use It For |
 | --- | --- | --- |
 | [ADR Index](adr/README.md) | active | navigate durable decisions |
 | [ADR-0001: Local Autonomous Coding Platform Architecture](adr/0001-platform-architecture.md) | proposed | top-level platform architecture and v1 constraints |
-| [ADR-0002: Secret Bootstrap and Local Secret UX](adr/0002-secret-bootstrap-and-local-secret-ux.md) | accepted | operator-mediated bootstrap and declarative local secret UX |
+| [ADR-0002: Secret Bootstrap and Local Secret UX](adr/0002-secret-bootstrap-and-local-secret-ux.md) | superseded | historical local secret UX rationale that is superseded by ADR-0008 |
 | [ADR-0003: Runtime Secret Materialization](adr/0003-runtime-secret-materialization.md) | accepted | runtime secret injection and lifecycle rules |
 | [ADR-0004: Local Substrate Selection](adr/0004-local-substrate-selection.md) | proposed | hypervisor, networking, and local cluster substrate choices |
 | [ADR-0005: Session Exposure and Routing](adr/0005-session-exposure-and-routing.md) | proposed | session URL resolution and localhost-only routing direction |

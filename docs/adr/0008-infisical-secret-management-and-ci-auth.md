@@ -107,5 +107,6 @@ The platform needs one current secret system that works for:
 
 ## Follow-Up
 
+- this ADR supersedes [ADR-0002](0002-secret-bootstrap-and-local-secret-ux.md) for active backend, CI auth, and secret scanning policy
 - operational details live in [Secret Management](../specs/platform/secret-management.md)
 - repo sequencing lives in [Operator Prerequisites](../plans/00-operator-prerequisites.md) and [Repo Foundations](../plans/01-repo-foundations.md)
