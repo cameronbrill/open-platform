@@ -1,0 +1,11 @@
+steps:
+  - label: ":mag: check"
+    command:
+      - "mise install"
+      - "pnpm install --frozen-lockfile"
+      - "mise run check"
+  - label: ":hammer: validate"
+    command:
+      - "mise install"
+      - "pnpm install --frozen-lockfile"
+      - "mise run validate"

@@ -1,0 +1,92 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultBase": "main",
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "sharedGlobals": [
+      "{workspaceRoot}/.infisical-scan.toml",
+      "{workspaceRoot}/dprint.json",
+      "{workspaceRoot}/fnox.toml",
+      "{workspaceRoot}/hk.pkl",
+      "{workspaceRoot}/mise.toml",
+      "{workspaceRoot}/nx.json",
+      "{workspaceRoot}/package.json",
+      "{workspaceRoot}/pnpm-lock.yaml",
+      "{workspaceRoot}/pnpm-workspace.yaml",
+      "{workspaceRoot}/project.json",
+      "{workspaceRoot}/tsconfig.base.json",
+      "{workspaceRoot}/tsconfig.json"
+    ]
+  },
+  "targetDefaults": {
+    "build": {
+      "cache": true
+    },
+    "build-go": {
+      "cache": true
+    },
+    "build-ts": {
+      "cache": true
+    },
+    "check": {
+      "cache": false
+    },
+    "cluster-smoke": {
+      "cache": false
+    },
+    "dev-tilt": {
+      "cache": false
+    },
+    "fmt": {
+      "cache": false
+    },
+    "fmt-check": {
+      "cache": true
+    },
+    "lint": {
+      "cache": true
+    },
+    "lint-go": {
+      "cache": true
+    },
+    "lint-ts": {
+      "cache": true
+    },
+    "obs-smoke": {
+      "cache": false
+    },
+    "secrets-scan": {
+      "cache": false
+    },
+    "security-smoke": {
+      "cache": false
+    },
+    "test": {
+      "cache": true
+    },
+    "test-contract": {
+      "cache": true
+    },
+    "test-e2e": {
+      "cache": false
+    },
+    "test-go": {
+      "cache": true
+    },
+    "test-integration": {
+      "cache": false
+    },
+    "test-ts": {
+      "cache": true
+    },
+    "typecheck": {
+      "cache": true
+    },
+    "typecheck-ts": {
+      "cache": true
+    },
+    "validate": {
+      "cache": false
+    }
+  }
+}

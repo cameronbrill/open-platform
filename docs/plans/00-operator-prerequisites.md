@@ -4,7 +4,7 @@ doc_id: "PLAN-000"
 doc_type: "plan"
 status: "draft"
 date: "2026-03-08"
-updated: "2026-03-09"
+updated: "2026-03-10"
 summary: "Manual setup, accounts, and operator-owned decisions required before implementation begins."
 aliases:
   - "Plan 00"
@@ -83,9 +83,9 @@ These must be captured in [ADRs](../adr/README.md) when they become durable arch
 ### Account and Secret Prerequisites
 
 - create or access the Infisical organization, project, and environments needed for the repo
-- install and authenticate the `Infisical` CLI
+- authenticate the repo-managed `Infisical` CLI installed through `mise`
 - confirm local secret access works from the intended operator environment
-- install or bootstrap `fnox` if it is required in the local operator path
+- confirm the repo-managed `fnox` install provided through `mise` is available locally
 - confirm repo-declared local secret workflows work through `fnox`
 - create or confirm model provider account and API credentials
 - create Better Stack account, sources, and tokens

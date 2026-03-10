@@ -4,7 +4,7 @@ doc_id: "SPEC-PLATFORM-SECRETS-001"
 doc_type: "spec"
 status: "draft"
 date: "2026-03-09"
-updated: "2026-03-09"
+updated: "2026-03-10"
 summary: "Current secret management model for local development, CI, runtime materialization, and secret scanning, with Infisical as backend and fnox as local declarative UX."
 aliases:
   - "Platform Secret Management"
@@ -60,6 +60,7 @@ Define the current active secret-management model for Open Platform.
 - `Infisical` secret scanning is used in pre-commit workflows.
 - runtime secrets use task-mediated materialization.
 - `mise` remains the public interface for secret-aware tasks.
+- the `Infisical` and `fnox` CLIs are installed through repo-managed `mise` tooling.
 - CI should use a machine-oriented Infisical auth flow rather than a human desktop-oriented flow.
 
 [ADR-0008](../../adr/0008-infisical-secret-management-and-ci-auth.md) is the active secret-management ADR. [ADR-0002](../../adr/0002-secret-bootstrap-and-local-secret-ux.md) remains historical context for the local declarative UX only.
@@ -117,6 +118,7 @@ Use either the generic provider model or provider-specific naming, but do not mi
 ## Local Operator Auth
 
 - operators bootstrap local secret access for `fnox` using `Infisical`
+- operators authenticate the repo-managed `infisical` CLI locally after `mise install`
 - local tasks fetch secrets through repo-declared `fnox` configuration
 - long-lived exported `.env` flows are not part of the default model
 - local secret access should prefer `mise`-invoked execution rather than ad hoc shell exports or raw direct secret lookups
@@ -146,20 +148,20 @@ Use either the generic provider model or provider-specific naming, but do not mi
 
 ## Secret Lifecycle Matrix
 
-| Phase | Source of truth | Materialization rules | Cleanup / invalidation |
-| --- | --- | --- | --- |
-| local bootstrap | `Infisical` via operator-authenticated `fnox` flows | retrieve only through documented `mise` or repo-declared `fnox` execution | no committed `.env`, no shell-profile persistence as the default path |
-| CI execution | `Infisical` via machine-oriented CI auth | only documented trusted jobs may retrieve the secrets they need at runtime | job-scoped credentials stay minimal and rotatable; untrusted jobs receive no privileged secret access |
-| session create | `Infisical`-backed task mediation | materialize only the secret and auth state required for that session | secret-bearing setup output must not persist in committed artifacts, URLs, or debug logs |
-| session restart | same source of truth as create | recreate or revalidate any session-scoped auth needed after restart | invalidate superseded session-scoped auth material |
-| session delete | same source of truth as create | no new secret material should be created during teardown except as required for safe cleanup | remove session-scoped auth material and any teardown-owned runtime secret state |
-| cluster reset / incident response | same source of truth as create and CI | treat reset as destructive recovery, not a normal lifecycle shortcut | remove local runtime secret state and rotate or revoke impacted credentials when the incident requires it |
+| Phase                             | Source of truth                                     | Materialization rules                                                                        | Cleanup / invalidation                                                                                    |
+| --------------------------------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| local bootstrap                   | `Infisical` via operator-authenticated `fnox` flows | retrieve only through documented `mise` or repo-declared `fnox` execution                    | no committed `.env`, no shell-profile persistence as the default path                                     |
+| CI execution                      | `Infisical` via machine-oriented CI auth            | only documented trusted jobs may retrieve the secrets they need at runtime                   | job-scoped credentials stay minimal and rotatable; untrusted jobs receive no privileged secret access     |
+| session create                    | `Infisical`-backed task mediation                   | materialize only the secret and auth state required for that session                         | secret-bearing setup output must not persist in committed artifacts, URLs, or debug logs                  |
+| session restart                   | same source of truth as create                      | recreate or revalidate any session-scoped auth needed after restart                          | invalidate superseded session-scoped auth material                                                        |
+| session delete                    | same source of truth as create                      | no new secret material should be created during teardown except as required for safe cleanup | remove session-scoped auth material and any teardown-owned runtime secret state                           |
+| cluster reset / incident response | same source of truth as create and CI               | treat reset as destructive recovery, not a normal lifecycle shortcut                         | remove local runtime secret state and rotate or revoke impacted credentials when the incident requires it |
 
 ## Secret Scanning
 
 ### Pre-Commit Scanning
 
-- staged diff scanning is required in pre-commit workflows
+- staged pre-commit scanning is required in pre-commit workflows
 - likely secret commits should block by default
 - scan configuration should stay repo-managed and explicit
 

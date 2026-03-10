@@ -1,0 +1,7 @@
+.DS_Store
+.nx/
+coverage/
+dist/
+node_modules/
+pnpm-debug.log*
+fnox.local.toml

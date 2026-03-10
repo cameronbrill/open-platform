@@ -4,7 +4,7 @@ doc_id: "SPEC-PLATFORM-TOOLING-001"
 doc_type: "spec"
 status: "draft"
 date: "2026-03-09"
-updated: "2026-03-09"
+updated: "2026-03-10"
 summary: "Current tooling architecture for package management, task orchestration, Go project integration, CI, dependency automation, and secret scanning."
 aliases:
   - "Repo Tooling"
@@ -62,12 +62,14 @@ Define the current active tooling architecture for the repo.
 
 - public developer and operator entrypoint
 - environment bootstrap and stable task surface
+- repo-managed CLI installation for tools such as `pnpm`, `dprint`, `hk`, `pkl`, `fnox`, and `Infisical`
 
 ### `fnox`
 
 - declarative repo-level secret UX for local secret-aware workflows
 - maps repo-declared secret names and profiles to the active backend
 - integrates with `mise` rather than replacing it
+- is installed through the repo-managed `mise` toolchain even though operator auth remains manual
 
 ### `Graphite`
 
@@ -132,6 +134,7 @@ Expected install flow:
 
 - contributors use the repo-managed environment to run `pnpm install`
 - CI uses lockfile-driven installs and should prefer frozen lockfile behavior
+- the root `package.json` `packageManager` field is the Corepack pin for `pnpm`
 
 ## Workspace Layout Conventions
 
@@ -240,6 +243,7 @@ The canonical staged scan should be routed through `mise` rather than a bespoke 
 ## Contributor Guidance
 
 - use `mise` to bootstrap the environment
+- run `mise install` before using repo-owned tasks
 - use repo-declared `fnox` flows for local secret-aware execution
 - use `pnpm` for Node dependency management
 - use `Nx` for internal project/task orchestration

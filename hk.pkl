@@ -1,0 +1,25 @@
+amends "package://github.com/jdx/hk/releases/download/v1.38.0/hk@1.38.0#/Config.pkl"
+
+default_branch = "main"
+exclude = List("node_modules", ".git", ".nx", ".opencode/node_modules")
+
+hooks {
+    ["pre-commit"] {
+        steps {
+            ["check"] {
+                check = "mise run check"
+                exclusive = true
+                output_summary = "combined"
+            }
+        }
+    }
+    ["pre-push"] {
+        steps {
+            ["validate"] {
+                check = "mise run validate"
+                exclusive = true
+                output_summary = "combined"
+            }
+        }
+    }
+}

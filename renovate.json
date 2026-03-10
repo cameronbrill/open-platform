@@ -1,0 +1,18 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:best-practices"],
+  "enabledManagers": ["buildkite", "dockerfile", "gomod", "mise", "npm"],
+  "labels": ["dependencies"],
+  "prConcurrentLimit": 5,
+  "packageRules": [
+    {
+      "groupName": "routine dependency updates",
+      "matchManagers": ["buildkite", "dockerfile", "gomod", "mise", "npm"],
+      "matchUpdateTypes": ["digest", "minor", "patch"]
+    },
+    {
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
+    }
+  ]
+}

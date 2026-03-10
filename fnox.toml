@@ -1,0 +1,14 @@
+if_missing = "error"
+
+[providers]
+infisical = { type = "infisical", environment = "dev", path = "/" }
+
+[secrets]
+BETTER_STACK_INGESTING_HOST = { provider = "infisical", value = "BETTER_STACK_INGESTING_HOST" }
+BETTER_STACK_SOURCE_TOKEN = { provider = "infisical", value = "BETTER_STACK_SOURCE_TOKEN" }
+MODEL_API_KEY = { provider = "infisical", value = "MODEL_API_KEY" }
+MODEL_PROVIDER = { provider = "infisical", value = "MODEL_PROVIDER" }
+OPENCODE_SERVER_PASSWORD = { provider = "infisical", value = "OPENCODE_SERVER_PASSWORD" }
+
+[profiles.ci.providers]
+infisical = { type = "infisical", environment = "ci", path = "/" }
