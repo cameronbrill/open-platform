@@ -123,6 +123,8 @@ Tests should verify that common failures produce operator-meaningful guidance an
 ## Authentication and Open-Session UX
 
 - auth requirements must be visible without turning the UI into a password store
+- the frontend relies on the backend-owned `GET /sessions/{id}/open` flow rather than constructing session URLs directly
+- a not-ready session should show a clear retryable not-ready outcome rather than a broken link or speculative URL
 - the operator should be able to tell whether a failure is auth-related or session-related
 - future remote gateway support must not require redesigning the UI model
 

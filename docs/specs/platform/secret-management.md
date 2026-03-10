@@ -62,6 +62,8 @@ Define the current active secret-management model for Open Platform.
 - `mise` remains the public interface for secret-aware tasks.
 - CI should use a machine-oriented Infisical auth flow rather than a human desktop-oriented flow.
 
+[ADR-0008](../../adr/0008-infisical-secret-management-and-ci-auth.md) is the active secret-management ADR. [ADR-0002](../../adr/0002-secret-bootstrap-and-local-secret-ux.md) remains historical context for the local declarative UX only.
+
 ## Backend Versus Interface
 
 - `Infisical` owns secret storage, CI auth, and scanning capabilities.
@@ -96,6 +98,8 @@ The repo should converge on a small, explicit environment model such as:
 - `MODEL_API_KEY`
 - `BETTER_STACK_SOURCE_TOKEN`
 - `BETTER_STACK_INGESTING_HOST`
+
+If `OPENCODE_SERVER_PASSWORD` remains required by the current OpenCode runtime, treat it as runtime bootstrap input only. It must not be surfaced directly through the session index API or URLs, and any later per-session derivation or replacement must still follow the lifecycle matrix below.
 
 ### Required When CI Is Enabled
 
@@ -140,6 +144,17 @@ Use either the generic provider model or provider-specific naming, but do not mi
 - baking secrets into images
 - storing secret values in `nix`
 
+## Secret Lifecycle Matrix
+
+| Phase | Source of truth | Materialization rules | Cleanup / invalidation |
+| --- | --- | --- | --- |
+| local bootstrap | `Infisical` via operator-authenticated `fnox` flows | retrieve only through documented `mise` or repo-declared `fnox` execution | no committed `.env`, no shell-profile persistence as the default path |
+| CI execution | `Infisical` via machine-oriented CI auth | only documented trusted jobs may retrieve the secrets they need at runtime | job-scoped credentials stay minimal and rotatable; untrusted jobs receive no privileged secret access |
+| session create | `Infisical`-backed task mediation | materialize only the secret and auth state required for that session | secret-bearing setup output must not persist in committed artifacts, URLs, or debug logs |
+| session restart | same source of truth as create | recreate or revalidate any session-scoped auth needed after restart | invalidate superseded session-scoped auth material |
+| session delete | same source of truth as create | no new secret material should be created during teardown except as required for safe cleanup | remove session-scoped auth material and any teardown-owned runtime secret state |
+| cluster reset / incident response | same source of truth as create and CI | treat reset as destructive recovery, not a normal lifecycle shortcut | remove local runtime secret state and rotate or revoke impacted credentials when the incident requires it |
+
 ## Secret Scanning
 
 ### Pre-Commit Scanning
@@ -173,6 +188,8 @@ Use either the generic provider model or provider-specific naming, but do not mi
 - document CI bootstrap credential rotation expectations
 - document session-scoped secret invalidation expectations
 
+For v1, the minimum expectation is that delete and reset invalidate session-scoped auth material, and restart does not rely on stale reusable credentials.
+
 ## Failure Modes
 
 - Infisical unavailable locally
@@ -180,6 +197,12 @@ Use either the generic provider model or provider-specific naming, but do not mi
 - auth failure
 - scanning false positives
 - runtime retrieval failure
+
+## CI Trust Boundary
+
+- Buildkite jobs that run on untrusted changes must not receive Infisical-backed runtime secrets or other privileged credentials
+- only documented trusted jobs may authenticate to `Infisical`
+- CI logs and artifacts must not contain secret values or become an alternate secret transport path
 
 ## Acceptance Criteria
 

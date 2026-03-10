@@ -78,6 +78,10 @@ The session index follows a strict v1 boundary:
 - Use [Repository Tooling](repository-tooling.md) for the active package manager, orchestration, CI, and dependency automation model.
 - Use plans for sequencing, milestones, and exit criteria.
 
+## Decision Status Note
+
+This spec intentionally describes the current intended implementation direction. `ADR-0001`, `ADR-0004`, and `ADR-0005` are still `proposed`, so any substrate-specific or session-exposure-specific defaults below should be read as contingent working assumptions until those ADRs are accepted.
+
 ## Goals
 
 - provide isolated autonomous OpenCode sessions
@@ -664,6 +668,19 @@ The final platform should document:
 - PVC lifecycle and reclaim behavior
 - cleanup semantics on delete and reset
 
+### Working v1 Workspace Lifecycle
+
+Until a later ADR or accepted spec changes the rule set, downstream implementation should assume:
+
+| Operation | Workspace behavior | Secret/auth behavior |
+| --- | --- | --- |
+| create | create a fresh isolated workspace for that session | materialize only the secret and auth state needed for that session |
+| restart | preserve the existing session workspace by default | recreate or revalidate any session-scoped auth material needed after restart |
+| delete | remove the session workspace and its PVC | invalidate and remove session-scoped auth material |
+| cluster reset | remove local session workspaces and other session state needed to return to a clean baseline | remove session-scoped auth material and other reset-owned runtime secret state |
+
+v1 should not assume a shared clone cache by default. If clone reuse is introduced later, it must be documented explicitly with its isolation and cleanup rules.
+
 ## Access Model
 
 ### v1 Access Rules
@@ -727,6 +744,14 @@ Routing options may include path-based or host-based routing, but the final choi
 
 The index backend, not the frontend, should own URL resolution for operator-visible open URLs.
 
+Working v1 contract:
+
+- `GET /sessions/{id}/open` is the canonical session-open entrypoint for the session index
+- not-ready sessions return a normalized not-ready outcome rather than a speculative open URL
+- ready sessions return a resolved open URL plus non-secret access metadata only
+- normal API responses must not expose raw reusable credentials or embed them in URLs
+- operator-visible auth failures must be distinguishable from session-startup or substrate failures
+
 ## Session Index Application Architecture
 
 ### Backend Responsibilities
@@ -766,6 +791,8 @@ Canonical operator-facing fields are defined in [Session Index API](session-inde
 - `authRequired`
 - `restartCount`
 - `failureReason`
+
+`url` should be absent or `null` until the backend can safely resolve an operator-visible open target.
 
 ## API Contract
 
@@ -837,6 +864,7 @@ At a minimum, the session index must define:
 
 1. session resources are recycled or recreated
 2. index page reflects transient state
+3. workspace state is preserved by default for the same session unless a later documented recreate flow says otherwise
 3. telemetry records restart cause and outcome
 
 ## Observability Design
@@ -886,6 +914,8 @@ The platform should document retention for:
 - OTEL buffers
 - Better Stack retention settings
 - cleanup behavior for session delete and cluster reset
+
+At minimum, the retained-versus-removed behavior for workspaces, session-scoped auth material, and cluster-reset cleanup must stay aligned with the working v1 workspace lifecycle above.
 
 ## Supply Chain and Artifact Trust Policy
 

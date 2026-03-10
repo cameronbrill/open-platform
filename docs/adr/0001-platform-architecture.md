@@ -27,6 +27,10 @@ superseded_by: []
 
 # ADR-0001: Local Autonomous Coding Platform Architecture
 
+## Status Note
+
+This ADR is still `proposed`. Treat it as the umbrella v1 direction, not as fully ratified architecture. The unresolved substrate and routing details in [ADR-0004](0004-local-substrate-selection.md) and [ADR-0005](0005-session-exposure-and-routing.md) remain gating decisions for downstream implementation detail.
+
 ## Context
 
 The platform should support safe autonomous OpenCode sessions while preserving a low-cognitive-load daily workflow.
@@ -69,6 +73,8 @@ Adopt the following architecture:
 - `fnox` for declarative local secret UX, backed by `Infisical`.
 - behavior-focused TDD for repo-owned code and contracts.
 - `mise` as the public entrypoint for validation and testing workflows.
+
+Downstream specs and plans may use this as the current working direction, but any substrate-specific or session-exposure-specific implementation should stay aligned with the still-proposed ADRs that close those boundaries.
 
 The platform is explicitly single-user in v1. All browser-facing surfaces are localhost-only by default. Future remote access must be supported by adding a dedicated authenticated gateway layer without redesigning the internal session model.
 
